@@ -50,24 +50,30 @@ const NewsCard = ({
       padding={4}
       onClick={handleClick}
       flexDirection="row"
-      height="sm"
+      minHeight="200px"
     >
-      <Box w="full">
-        <Card.Header pb={0}>
-          <Heading size="md">{title}</Heading>
-        </Card.Header>
+      <Box
+        w="full"
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+      >
+        <Box>
+          <Card.Body>
+            <Heading size="md">{title}</Heading>
+            <Text pt={4}>{summary}</Text>
+          </Card.Body>
+        </Box>
 
-        <Card.Body pt={2}>
-          <Text>{summary}</Text>
-        </Card.Body>
-
-        <Card.Footer pt={0}>
-          <Text fontSize="sm" color="gray.500">
-            Source: {source}
-          </Text>
-          <Text fontSize="sm" color="gray.500">
-            {date}
-          </Text>
+        <Card.Footer mt="auto">
+          <Flex alignItems="center" gap={4}>
+            <Text fontSize="sm" color="gray.500">
+              Source: {source}
+            </Text>
+            <Text fontSize="sm" color="gray.500">
+              {date}
+            </Text>
+          </Flex>
         </Card.Footer>
       </Box>
       <Image
