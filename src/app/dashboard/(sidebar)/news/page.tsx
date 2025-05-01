@@ -72,8 +72,8 @@ const Page = () => {
   const [category, setCategory] = useState("");
 
   return (
-    <Box py={8}>
-      <Container maxW="container.xl">
+    <Box py={8} width="100%">
+      <Box width={"100%"}>
         <VStack gap={8} align="stretch">
           <Heading as="h1" size="xl">
             ESG News
@@ -100,7 +100,7 @@ const Page = () => {
             </Box>
           )}
         </VStack>
-      </Container>
+      </Box>
     </Box>
   );
 };

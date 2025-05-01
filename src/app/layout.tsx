@@ -1,18 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Provider } from "@/components/ui/provider";
-import { Toaster } from "@/components/ui/toaster";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { Box, VStack } from "@chakra-ui/react";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,11 +14,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Provider>
-          <Toaster></Toaster>
+<html>
+      <body style={{ height: "100vh",  overflow: "hidden" }}>
+        <Provider >
+          <Box width='100%' height="full">
           {children}
+          </Box>
         </Provider>
       </body>
     </html>
