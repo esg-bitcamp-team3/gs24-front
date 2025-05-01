@@ -1,60 +1,124 @@
 // src/components/Navbar.tsx
+'use client'
 
-import React from 'react';
-import { LuCircleUser } from "react-icons/lu";
-
-interface NavItem {
-  label: string;
-  href: string;
-}
-
-const navItems: NavItem[] = [
-  { label: 'dashboard', href: '/dashboard' },
-  { label: 'Compare', href: '/compare' },
-  { label: 'search', href: '/search' },
-  { label: 'Mypage', href: '/mypage' },
-  { label: 'Logout', href: '/home' },
-];
+import {
+  Avatar,
+  Box,
+  Button,
+  Flex,
+  IconButton,
+  Input,
+  Stack,
+  Image,
+  Text,
+  Group,
+  InputGroup,
+  Dialog,
+  Portal,
+  Field,
+  AspectRatio,
+  CloseButton,
+} from '@chakra-ui/react'
+import {useRouter} from 'next/navigation'
+import React from 'react'
+import {LuLogOut, LuSearch} from 'react-icons/lu'
 
 const Navbar: React.FC = () => {
+  const router = useRouter()
+  const ref = React.useRef<HTMLInputElement>(null)
+
+  const handleClick = () => {
+    router.push('/dashboard/myPage')
+  }
   return (
-    <nav style={styles.navbar}>
-      <a href="/dashboard" style={styles.logo}>MyLogo</a>
-      <div style={styles.menu}>
-        {navItems.map((item) => (
-          <a key={item.label} href={item.href} style={styles.menuItem}>
-            {item.label}
-          </a>
-        ))}
-      </div>
-    </nav>
-  );
-};
+    <Flex
+      direction="row"
+      align="center"
+      py="2"
+      justify="space-between"
+      backgroundColor="white"
+      boxShadow="sm"
+      shadowColor={'blackAlpha.200'}
+      width="100%"
+      position="fixed" // 💡 화면 상단에 고정
+      top="0" // 💡 위에서 0 위치
+      zIndex="1000" // 💡 다른 요소보다 위에 출력
+      height="65px" // 💡 높이도 명시적으로 주면 안정감 있어
+    >
+      <Box display="flex" paddingX="4" alignItems="center" width="10%">
+        <Text fontWeight="bold" textStyle={'3xl'} color={'black'}>
+          GS24
+        </Text>
+        {/* <Image
+          src="/logo.png"
+          onClick={() => router.push('/dashboard')}
+          cursor="pointer"
+        /> */}
+      </Box>
 
-const styles: { [key: string]: React.CSSProperties } = {
-  navbar: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#0f2f4f',
-    padding: '1rem 2rem',
-  },
-  logo: {
-    color: 'white',
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    textDecoration: 'none',
-  },
-  menu: {
-    display: 'flex',
-    gap: '1.5rem',
-  },
-  menuItem: {
-    color: 'white',
-    textDecoration: 'none',
-    fontSize: '1rem',
-    transition: 'color 0.3s',
-  },
-};
+      <Box display="flex" alignItems="center" gap="4">
+        {/* 비교하기 버튼================================================================== */}
+        <Button
+          paddingLeft={3}
+          paddingRight={3}
+          variant="outline"
+          color="black"
+          aria-label="compare"
+          onClick={() => router.push('/dashboard/companyCompare')}>
+          비교하기
+        </Button>
+        {/* 검색하기 버튼================================================================== */}
+        <Dialog.Root placement="center">
+          <Dialog.Trigger asChild>
+            <Button variant="outline" size="sm" padding={3}>
+              <LuSearch />
+              Search
+            </Button>
+          </Dialog.Trigger>
+          <Portal>
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+              <Dialog.Content padding={4}>
+                <Dialog.Header>
+                  <Input placeholder='search'/>
+                </Dialog.Header>
+                <Dialog.Body pt="4">
+                
+                </Dialog.Body>
+                <Dialog.CloseTrigger top="0" insetEnd="-12" asChild>
+                  <CloseButton bg="bg" size="sm" />
+                </Dialog.CloseTrigger>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Portal>
+        </Dialog.Root>
 
-export default Navbar;
+        {/* <InputGroup flex="1" startElement={<LuSearch 
+          style={{
+            position: 'relative',  
+            left: '10px',            
+            fontSize: '1rem',     
+            color: 'gray.500',}} />}>
+          <Input placeholder="Search..." />
+        </InputGroup>       */}
+        {/* 아바타================================================================== */}
+        <div onClick={handleClick} style={{cursor: 'pointer'}}>
+          <Avatar.Root shape="full" size="lg">
+            <Avatar.Fallback name="Segun Adebayo" />
+            <Avatar.Image src="https://cdn.myanimelist.net/r/84x124/images/characters/9/131317.webp?s=d4b03c7291407bde303bc0758047f6bd" />
+          </Avatar.Root>
+        </div>
+        {/* 나가기 버튼================================================================== */}
+        <IconButton
+          variant="ghost"
+          color="black"
+          aria-label="Logout"
+          onClick={() => router.push('/home')}>
+          <LuLogOut />
+        </IconButton>
+      </Box>
+    </Flex>
+  )
+}
+
+export default Navbar
