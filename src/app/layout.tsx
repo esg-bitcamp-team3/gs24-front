@@ -17,7 +17,7 @@ export default function RootLayout({
 <html>
       <body style={{ height: "100vh",  overflow: "hidden" }}>
         <Provider >
-          <Box width='100%' height="full">
+          <Box width='100%' height="full" bg={'#f7f7f7'}>
           {children}
           </Box>
         </Provider>

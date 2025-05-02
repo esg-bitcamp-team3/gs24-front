@@ -8,16 +8,11 @@ import {
   Flex,
   IconButton,
   Input,
-  Stack,
-  Image,
   Text,
-  Group,
-  InputGroup,
+  Image,
   Dialog,
   Portal,
-  Field,
-  AspectRatio,
-  CloseButton,
+  CloseButton
 } from '@chakra-ui/react'
 import {useRouter} from 'next/navigation'
 import React from 'react'
@@ -46,14 +41,14 @@ const Navbar: React.FC = () => {
       height="65px" // 💡 높이도 명시적으로 주면 안정감 있어
     >
       <Box display="flex" paddingX="4" alignItems="center" width="10%">
-        <Text fontWeight="bold" textStyle={'3xl'} color={'black'}>
+        {/* <Text fontWeight="bold" textStyle={'3xl'} color={'black'}>
           GS24
-        </Text>
-        {/* <Image
+        </Text> */}
+        <Image
           src="/logo.png"
           onClick={() => router.push('/dashboard')}
           cursor="pointer"
-        /> */}
+        />
       </Box>
 
       <Box display="flex" alignItems="center" gap="4">
@@ -68,7 +63,7 @@ const Navbar: React.FC = () => {
           비교하기
         </Button>
         {/* 검색하기 버튼================================================================== */}
-        <Dialog.Root placement="center">
+        <Dialog.Root scrollBehavior={'inside'} placement="center">
           <Dialog.Trigger asChild>
             <Button variant="outline" size="sm" padding={3}>
               <LuSearch />
@@ -80,11 +75,26 @@ const Navbar: React.FC = () => {
             <Dialog.Positioner>
               <Dialog.Content padding={4}>
                 <Dialog.Header>
-                  <Input placeholder='search'/>
+                  <Input paddingLeft={3} placeholder="search" />
                 </Dialog.Header>
                 <Dialog.Body pt="4">
-                
+                  <Box>
+                    <Button
+                      paddingLeft={3}
+                      variant="ghost"
+                      color="black"
+                      justifyContent="flex-start"
+                      onClick={() => router.push('/dashboard/companyCompare')}
+                      w={'100%'}>
+                      비교하기
+                    </Button>
+                  </Box>
                 </Dialog.Body>
+                <Dialog.Footer>
+                <Dialog.ActionTrigger asChild>
+                <Button variant="outline">Close</Button>
+              </Dialog.ActionTrigger>
+                </Dialog.Footer>
                 <Dialog.CloseTrigger top="0" insetEnd="-12" asChild>
                   <CloseButton bg="bg" size="sm" />
                 </Dialog.CloseTrigger>
