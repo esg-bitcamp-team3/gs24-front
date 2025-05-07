@@ -6,7 +6,7 @@ const ESGRatings = () => {
       <VStack align="center" px="6" width="full" height="full">
         <Flex w="full">
           <Text fontSize="lg" fontWeight="bold" textAlign="start">
-            삼성전자
+            LG
           </Text>
         </Flex>
       </VStack>
