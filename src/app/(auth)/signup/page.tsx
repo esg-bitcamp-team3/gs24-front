@@ -1,38 +1,59 @@
-"use client";
+'use client'
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, {useState} from 'react'
+import {useRouter} from 'next/navigation'
 
-import { toaster } from "@/components/ui/toaster";
-import { ApiError } from "next/dist/server/api-utils";
-import {
-  Box,
-  Button,
-  Flex,
-  FieldLabel,
-  Fieldset,
-  Input,
-  Stack,
-  Text,
-  useBreakpointValue,
-  Field,
-  Link,
-  Card,
-  Heading,
-} from "@chakra-ui/react";
+import {toaster} from '@/components/ui/toaster'
+import {ApiError} from 'next/dist/server/api-utils'
+import {Box, Button, Flex, Input, Stack, Text, Card, Heading} from '@chakra-ui/react'
+import {signup} from '@/lib/api/auth'
 
 const SignUpPage = () => {
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState('')
 
-  const [id, setId] = useState("");
-  const [email, setEmail] = useState(""); // 이메일 추가
-  const [Phonenumber, setPhonenumber] = useState(""); // 이메일 추가
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [usernameError, setUsernameError] = useState(""); // 아이디 중복 오류 메시지
-  const [emailError, setEmailError] = useState(""); // 이메일 중복 오류 메시지
-  const router = useRouter();
+  const [id, setId] = useState('')
+  const [email, setEmail] = useState('') // 이메일 추가
+  const [phonenumber, setPhonenumber] = useState('') // 이메일 추가
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState('')
+  const [usernameError, setUsernameError] = useState('') // 아이디 중복 오류 메시지
+  const [emailError, setEmailError] = useState('') // 이메일 중복 오류 메시지
+  const router = useRouter()
+
+  const handleSubmit = async () => {
+    console.log('handleSubmit called')
+    console.log('username:', username)
+
+    if (!username || !email || !id || !password || !confirmPassword || !phonenumber) {
+      setError('모든 필드를 채워주세요.')
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setError('비밀번호가 일치하지 않습니다.')
+      return
+    }
+
+    try {
+      await signup({
+        username: id,
+        password: password, // 비밀번호 추가
+        name: username,
+        email: email, // 이메일 추가
+        phone: phonenumber // 전화번호 추가
+      })
+      toaster.success({
+        title: '회원 가입 성공!'
+      })
+      router.push('/login')
+    } catch (error) {
+      toaster.error({
+        title:
+          error instanceof ApiError ? error.message : '알 수 없는 오류가 발생했습니다.'
+      })
+    }
+  }
 
   return (
     <Flex
@@ -42,7 +63,7 @@ const SignUpPage = () => {
       bg="white" // 필요시 배경
     >
       <Card.Root
-        boxAlign={"center"}
+        boxAlign={'center'}
         display="flex"
         justifyContent="center"
         minH="50vh"
@@ -52,8 +73,7 @@ const SignUpPage = () => {
         borderRadius="lg"
         boxShadow="lg"
         borderWidth="1px"
-        borderColor="white"
-      >
+        borderColor="white">
         <Flex
           justify="center"
           align="center"
@@ -65,14 +85,12 @@ const SignUpPage = () => {
           height="100%"
           padding={8}
           borderColor="white"
-          backdropFilter="blur(10px)"
-        >
+          backdropFilter="blur(10px)">
           <Box
-            width={{ base: "100%", md: "400px" }}
+            width={{base: '100%', md: '400px'}}
             bg="transparent"
             p={8}
-            borderRadius="md"
-          >
+            borderRadius="md">
             <Heading as="h2" size="lg" color="black" textAlign="center" mb={8}>
               Sign Up
             </Heading>
@@ -87,9 +105,9 @@ const SignUpPage = () => {
                   placeholder=""
                   type="text"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={e => setUsername(e.target.value)}
                   color="black"
-                  _placeholder={{ color: "gray.300" }}
+                  _placeholder={{color: 'gray.300'}}
                   borderColor="black"
                 />
               </Box>
@@ -101,9 +119,9 @@ const SignUpPage = () => {
                   variant="flushed"
                   placeholder=""
                   value={id}
-                  onChange={(e) => setId(e.target.value)}
+                  onChange={e => setId(e.target.value)}
                   color="black"
-                  _placeholder={{ color: "gray.300" }}
+                  _placeholder={{color: 'gray.300'}}
                   borderColor="black"
                 />
               </Box>
@@ -118,9 +136,9 @@ const SignUpPage = () => {
                   placeholder=""
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   color="black"
-                  _placeholder={{ color: "gray.300" }}
+                  _placeholder={{color: 'gray.300'}}
                   borderColor="black"
                 />
               </Box>
@@ -134,9 +152,9 @@ const SignUpPage = () => {
                   placeholder=""
                   type="password"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={e => setConfirmPassword(e.target.value)}
                   color="black"
-                  _placeholder={{ color: "gray.300" }}
+                  _placeholder={{color: 'gray.300'}}
                   borderColor="black"
                 />
               </Box>
@@ -148,9 +166,9 @@ const SignUpPage = () => {
                   variant="flushed"
                   placeholder=""
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   color="black"
-                  _placeholder={{ color: "gray.300" }}
+                  _placeholder={{color: 'gray.300'}}
                   borderColor="black"
                 />
               </Box>
@@ -163,10 +181,10 @@ const SignUpPage = () => {
                   variant="flushed"
                   placeholder=""
                   type="text"
-                  value={Phonenumber}
-                  onChange={(e) => setPhonenumber(e.target.value)}
+                  value={phonenumber}
+                  onChange={e => setPhonenumber(e.target.value)}
                   color="black"
-                  _placeholder={{ color: "gray.300" }}
+                  _placeholder={{color: 'gray.300'}}
                   borderColor="black"
                 />
               </Box>
@@ -180,10 +198,10 @@ const SignUpPage = () => {
               <Button
                 bg="black"
                 color="white"
-                _hover={{ bg: "gray.500" }}
+                _hover={{bg: 'gray.500'}}
                 size="lg"
                 fontWeight="bold"
-              >
+                onClick={handleSubmit}>
                 Create Account
               </Button>
               <Flex justify="center"></Flex>
@@ -192,7 +210,7 @@ const SignUpPage = () => {
         </Flex>
       </Card.Root>
     </Flex>
-  );
-};
+  )
+}
 
-export default SignUpPage;
+export default SignUpPage
