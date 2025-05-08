@@ -8,23 +8,51 @@ import {
   Flex,
   IconButton,
   Input,
-  Text,
   Image,
   Dialog,
   Portal,
-  CloseButton
+  Text
 } from '@chakra-ui/react'
 import {useRouter} from 'next/navigation'
 import React from 'react'
 import {LuLogOut, LuSearch} from 'react-icons/lu'
+import axios from 'axios'
+import {useEffect, useState} from 'react'
+
+// 백엔드에서 받아온 회사 리스트의 타입을 정의
+interface Company {
+  companyCode: string
+  companyName: string
+}
 
 const Navbar: React.FC = () => {
   const router = useRouter()
-  const ref = React.useRef<HTMLInputElement>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [companyList, setCompanyList] = useState<Company[]>([])
 
-  const handleClick = () => {
-    router.push('/dashboard/myPage')
+  const isValidCompanyList = (data: any): data is Company[] => {
+    return (
+      Array.isArray(data) &&
+      data.every(item => typeof item.companyCode === 'string' && typeof item.companyName === 'string')
+    )
   }
+
+  const filteredCompanies =
+    searchTerm === ''
+      ? companyList
+      : companyList.filter(company =>
+          company.companyName.trim().toLowerCase().includes(searchTerm.trim().toLowerCase())
+        )
+
+  useEffect(() => {
+    axios.get('http://localhost:8080/api/organizations')
+      .then(res => {
+        console.log('📦 받아온 회사 리스트:', res.data)
+        setCompanyList(res.data)
+      })
+      .catch(err => console.error('❌ 오류 발생:', err))
+  }, [])
+
   return (
     <Flex
       direction="row"
@@ -70,49 +98,58 @@ const Navbar: React.FC = () => {
               Search
             </Button>
           </Dialog.Trigger>
+
           <Portal>
             <Dialog.Backdrop />
             <Dialog.Positioner>
               <Dialog.Content padding={4}>
                 <Dialog.Header>
-                  <Input paddingLeft={3} placeholder="search" />
+                  <Input
+                    paddingLeft={3}
+                    marginBottom={3}
+                    placeholder="search"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm((e.target as HTMLInputElement).value)}
+                  />
                 </Dialog.Header>
+
                 <Dialog.Body pt="4">
-                  <Box>
-                    <Button
-                      paddingLeft={3}
-                      variant="ghost"
-                      color="black"
-                      justifyContent="flex-start"
-                      onClick={() => router.push('/dashboard/companyCompare')}
-                      w={'100%'}>
-                      비교하기
-                    </Button>
+                  <Box height={300}>
+                    {filteredCompanies.length === 0 ? (
+                      <Text color="gray.500" textAlign="center">
+                        No companies found.
+                      </Text>
+                    ) : (
+                      filteredCompanies.map(company => (
+                        <Button
+                          key={company.companyCode}
+                          paddingLeft={3}
+                          variant="ghost"
+                          color="black"
+                          justifyContent="flex-start"
+                          onClick={() =>
+                            router.push(`/dashboard/companyInfo/${company.companyCode}`)
+                          }
+                          w={'100%'}>
+                          {company.companyName}
+                        </Button>
+                      ))
+                    )}
                   </Box>
                 </Dialog.Body>
                 <Dialog.Footer>
-                <Dialog.ActionTrigger asChild>
-                <Button variant="outline">Close</Button>
-              </Dialog.ActionTrigger>
+                  <Dialog.ActionTrigger asChild>
+                    <Button variant="outline" marginTop={3} padding={3}>
+                      Close
+                    </Button>
+                  </Dialog.ActionTrigger>
                 </Dialog.Footer>
-                <Dialog.CloseTrigger top="0" insetEnd="-12" asChild>
-                  <CloseButton bg="bg" size="sm" />
-                </Dialog.CloseTrigger>
               </Dialog.Content>
             </Dialog.Positioner>
           </Portal>
         </Dialog.Root>
-
-        {/* <InputGroup flex="1" startElement={<LuSearch 
-          style={{
-            position: 'relative',  
-            left: '10px',            
-            fontSize: '1rem',     
-            color: 'gray.500',}} />}>
-          <Input placeholder="Search..." />
-        </InputGroup>       */}
         {/* 아바타================================================================== */}
-        <div onClick={handleClick} style={{cursor: 'pointer'}}>
+        <div onClick={() => router.push('/dashboard/myPage')} style={{cursor: 'pointer'}}>
           <Avatar.Root shape="full" size="lg">
             <Avatar.Fallback name="Segun Adebayo" />
             <Avatar.Image src="https://cdn.myanimelist.net/r/84x124/images/characters/9/131317.webp?s=d4b03c7291407bde303bc0758047f6bd" />
