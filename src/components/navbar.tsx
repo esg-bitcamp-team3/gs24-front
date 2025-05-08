@@ -30,7 +30,7 @@ const Navbar: React.FC = () => {
       direction="row"
       align="center"
       py="2"
-      justify="space-between"
+      justify="space-between" 
       backgroundColor="white"
       boxShadow="sm"
       shadowColor={'blackAlpha.200'}
