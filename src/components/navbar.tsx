@@ -111,14 +111,14 @@ const Navbar: React.FC = () => {
             color: 'gray.500',}} />}>
           <Input placeholder="Search..." />
         </InputGroup>       */}
-        {/* 아바타================================================================== */}
+        {/* 사용자 아이콘================================================================== */}
         <div onClick={handleClick} style={{cursor: 'pointer'}}>
           <Avatar.Root shape="full" size="lg">
             <Avatar.Fallback name="Segun Adebayo" />
             <Avatar.Image src="https://cdn.myanimelist.net/r/84x124/images/characters/9/131317.webp?s=d4b03c7291407bde303bc0758047f6bd" />
           </Avatar.Root>
         </div>
-        {/* 나가기 버튼================================================================== */}
+        {/* 로그아웃 버튼================================================================== */}
         <IconButton
           variant="ghost"
           color="black"
