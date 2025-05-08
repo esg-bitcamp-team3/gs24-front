@@ -1,7 +1,7 @@
-"use client";
+'use client'
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, {useState} from 'react'
+import {useRouter} from 'next/navigation'
 import {
   Box,
   Button,
@@ -11,14 +11,40 @@ import {
   Input,
   Link,
   Stack,
-  Text,
-} from "@chakra-ui/react";
+  Text
+} from '@chakra-ui/react'
+import {login} from '@/lib/api/auth'
+import {toaster} from '@/components/ui/toaster'
+import {ApiError} from 'next/dist/server/api-utils'
 
 const LoginPage = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const router = useRouter();
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const router = useRouter()
+
+  const handleSubmit = async () => {
+    if (!username || !password) {
+      setError('모든 필드를 채워주세요.')
+      return
+    }
+
+    try {
+      await login({
+        username: username,
+        password: password // 비밀번호 추가
+      })
+      toaster.success({
+        title: '로그인 성공!'
+      })
+      router.push('/dashboard')
+    } catch (error) {
+      toaster.error({
+        title:
+          error instanceof ApiError ? error.message : '알 수 없는 오류가 발생했습니다.'
+      })
+    }
+  }
 
   return (
     <Flex
@@ -28,7 +54,7 @@ const LoginPage = () => {
       bg="white" // 필요시 배경
     >
       <Card.Root
-        boxAlign={"center"}
+        boxAlign={'center'}
         display="flex"
         justifyContent="center"
         minH="50vh"
@@ -38,8 +64,7 @@ const LoginPage = () => {
         borderRadius="lg"
         boxShadow="lg"
         borderWidth="1px"
-        borderColor="white"
-      >
+        borderColor="white">
         <Flex
           justify="center"
           align="center"
@@ -51,14 +76,12 @@ const LoginPage = () => {
           height="100%"
           padding={8}
           borderColor="white"
-          backdropFilter="blur(10px)"
-        >
+          backdropFilter="blur(10px)">
           <Box
-            width={{ base: "100%", md: "400px" }}
+            width={{base: '100%', md: '400px'}}
             bg="transparent"
             p={8}
-            borderRadius="md"
-          >
+            borderRadius="md">
             <Heading as="h2" size="lg" color="black" textAlign="center" mb={8}>
               Sign in
             </Heading>
@@ -71,9 +94,9 @@ const LoginPage = () => {
                   variant="flushed"
                   placeholder=""
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={e => setUsername(e.target.value)}
                   color="black"
-                  _placeholder={{ color: "gray.300" }}
+                  _placeholder={{color: 'gray.300'}}
                   borderColor="black"
                 />
               </Box>
@@ -87,9 +110,9 @@ const LoginPage = () => {
                   placeholder=""
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   color="black"
-                  _placeholder={{ color: "gray.300" }}
+                  _placeholder={{color: 'gray.300'}}
                   borderColor="black"
                 />
               </Box>
@@ -103,10 +126,10 @@ const LoginPage = () => {
               <Button
                 bg="black"
                 color="white"
-                _hover={{ bg: "gray.500" }}
+                _hover={{bg: 'gray.500'}}
                 size="lg"
                 fontWeight="bold"
-              >
+                onClick={handleSubmit}>
                 LOGIN
               </Button>
               <Flex justify="center">
@@ -115,8 +138,7 @@ const LoginPage = () => {
                   color="black"
                   fontSize="sm"
                   textAlign="center"
-                  _hover={{ textDecoration: "underline" }}
-                >
+                  _hover={{textDecoration: 'underline'}}>
                   Sign Up
                 </Link>
               </Flex>
@@ -125,7 +147,7 @@ const LoginPage = () => {
         </Flex>
       </Card.Root>
     </Flex>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default LoginPage
