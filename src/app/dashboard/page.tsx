@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Box,
   chakra,
@@ -9,22 +11,18 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react'
-import {BiCaretUp} from 'react-icons/bi'
 import {Table} from '@chakra-ui/react'
-import React, {useState, useEffect} from 'react'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend
-} from 'chart.js'
+import React, {useState, useEffect, use} from 'react'
 import {GoPlus} from 'react-icons/go'
 import {Button} from '@chakra-ui/react'
 import Link from 'next/link'
+import {get} from 'http'
+import {getInterestOrganization, getOrganizationRank} from '@/lib/api/get'
+import {
+  OrganizationInfo,
+  OrganizationInfoResponse,
+  OrganizationRank
+} from '@/lib/api/interfaces/interestOrganization'
 
 const items = [
   {id: 1, name: '제조업', category: '삼성전자', category1: 'SK하이닉스'},
@@ -79,6 +77,40 @@ const terms = [
   }
 ]
 export default function Dashboard() {
+  const [organizationList, setOrganizationList] = useState<OrganizationInfo[]>([])
+  const [organizationRank, setOrganizationRank] = useState<OrganizationRank[]>([])
+
+  useEffect(() => {
+    const interestOrganization = async () => {
+      try {
+        const data = await getInterestOrganization()
+
+        if (data) {
+          setOrganizationList(data?.organizationList || [])
+        } else {
+          return null
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    interestOrganization()
+
+    const organizationRank = async () => {
+      try {
+        const data = await getOrganizationRank()
+        if (data) {
+          setOrganizationRank(data || [])
+        } else {
+          return null
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    organizationRank()
+  }, [])
+
   return (
     <Flex
       flexDirection={{base: 'column', xl: 'row'}}
@@ -167,19 +199,22 @@ export default function Dashboard() {
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                {likeitems.map(likeitems => (
-                  <Table.Row key={likeitems.id}>
-                    <Table.Cell p={2} textAlign="center">
-                      {likeitems.name}
-                    </Table.Cell>
-                    <Table.Cell p={2} textAlign="center">
-                      {likeitems.category}
-                    </Table.Cell>
-                    <Table.Cell p={2} textAlign="center">
-                      {likeitems.sales1}
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
+                {organizationList &&
+                  organizationList.map(likeitems => (
+                    <Table.Row key={likeitems.organization.id}>
+                      <Table.Cell p={2} textAlign="center">
+                        {likeitems.organization.companyName}
+                      </Table.Cell>
+                      <Table.Cell p={2} textAlign="center">
+                        {/* {likeitems.organization.industry} */}
+                        {0}
+                      </Table.Cell>
+                      <Table.Cell p={2} textAlign="center">
+                        {/* {likeitems.organization.capital} */}
+                        {0}
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
               </Table.Body>
             </Table.Root>
           </Box>
@@ -221,22 +256,23 @@ export default function Dashboard() {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {rankitems.map(rankitems => (
-                <Table.Row key={rankitems.id}>
-                  <Table.Cell p={2} textAlign="center">
-                    {rankitems.name}
-                  </Table.Cell>
-                  <Table.Cell p={2} textAlign="center">
-                    {rankitems.category}
-                  </Table.Cell>
-                  <Table.Cell p={2} textAlign="center">
-                    {rankitems.rank1}
-                  </Table.Cell>
-                  <Table.Cell p={2} textAlign="center">
-                    {rankitems.score1}
-                  </Table.Cell>
-                </Table.Row>
-              ))}
+              {organizationRank &&
+                organizationRank.map((rankitems, index) => (
+                  <Table.Row key={index}>
+                    <Table.Cell p={2} textAlign="center">
+                      {index + 1}
+                    </Table.Cell>
+                    <Table.Cell p={2} textAlign="center">
+                      {rankitems.organizationName}
+                    </Table.Cell>
+                    <Table.Cell p={2} textAlign="center">
+                      {rankitems.esgGrade}
+                    </Table.Cell>
+                    <Table.Cell p={2} textAlign="center">
+                      {rankitems.esgScore}
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
             </Table.Body>
           </Table.Root>
         </Box>
