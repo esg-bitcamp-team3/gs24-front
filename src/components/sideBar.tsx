@@ -26,7 +26,7 @@ export default function SideBar() {
           variant="ghost"
           color="black"
           justifyContent="flex-start"
-          onClick={() => router.push('/dashboard/companyInfo')}>
+          onClick={() => router.push('/dashboard/companyInfo/{companyId}')}>
           <Text fontSize="lg" fontWeight="bold">
             <Icon as={FaRegBuilding} boxSize={5} mr={2} />
             기업정보

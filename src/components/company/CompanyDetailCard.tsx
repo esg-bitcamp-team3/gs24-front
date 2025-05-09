@@ -9,9 +9,10 @@ import {
   Separator,
   Text,
   VStack,
-  Button
+  Button,
+  Badge
 } from '@chakra-ui/react'
-import {MdCalendarMonth} from 'react-icons/md'
+
 import React, {useState, useEffect} from 'react'
 import {
   Chart as ChartJS,
@@ -23,8 +24,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js'
-import {Line} from 'react-chartjs-2'
-import {Badge} from '@chakra-ui/react'
+
 // 차트 등록
 ChartJS.register(
   CategoryScale,
@@ -36,7 +36,11 @@ ChartJS.register(
   Legend
 )
 
+
 import ESGWordCloud from '@/components/company/ESGWordCloud'
+import {Company} from '@/lib/api/interfaces/organizations'
+import {EsgRatingResponse} from '@/lib/api/interfaces/esgRating'
+import {EsgLineData} from '@/components/chartDataImport'
 
 // 가짜 데이터
 const mockSummary = [
@@ -52,48 +56,43 @@ const keywordNews = [
 ]
 
 // ESG 차트 데이터
-const esgLineData = {
-  labels: ['2021', '2022', '2023', '2024', '2025'],
-  datasets: [
-    {
-      label: 'E (환경)',
-      data: [60, 65, 70, 68, 74],
-      borderColor: 'rgba(72, 187, 120, 1)',
-      backgroundColor: 'rgba(72, 187, 120, 0.2)',
-      fill: true,
-      tension: 0.4
-    },
-    {
-      label: 'S (사회)',
-      data: [55, 60, 62, 65, 67],
-      borderColor: 'rgba(66, 153, 225, 1)',
-      backgroundColor: 'rgba(66, 153, 225, 0.2)',
-      fill: true,
-      tension: 0.4
-    },
-    {
-      label: 'G (지배구조)',
-      data: [70, 72, 74, 76, 79],
-      borderColor: 'rgba(245, 101, 101, 1)',
-      backgroundColor: 'rgba(245, 101, 101, 0.2)',
-      fill: true,
-      tension: 0.4
-    }
-  ]
-}
+// const esgLineData = {
+//   labels: ['2021', '2022', '2023', '2024', '2025'],
+//   datasets: [
+//     {
+//       label: 'E (환경)',
+//       data: [60, 65, 70, 68, 74],
+//       borderColor: 'rgba(72, 187, 120, 1)',
+//       backgroundColor: 'rgba(72, 187, 120, 0.2)',
+//       fill: true,
+//       tension: 0.4
+//     },
+//     {
+//       label: 'S (사회)',
+//       data: [55, 60, 62, 65, 67],
+//       borderColor: 'rgba(66, 153, 225, 1)',
+//       backgroundColor: 'rgba(66, 153, 225, 0.2)',
+//       fill: true,
+//       tension: 0.4
+//     },
+//     {
+//       label: 'G (지배구조)',
+//       data: [70, 72, 74, 76, 79],
+//       borderColor: 'rgba(245, 101, 101, 1)',
+//       backgroundColor: 'rgba(245, 101, 101, 0.2)',
+//       fill: true,
+//       tension: 0.4
+//     }
+//   ]
+// }
 
-const esgLineOptions = {
-  responsive: true,
-  plugins: {
-    legend: {position: 'top' as const},
-    title: {display: true, text: 'ESG 등급 변화 추이 (라인 그래프)'}
-  }
-}
 
-const CompanyInfoCard = () => {
+const CompanyInfoCard = ({orgId}: {orgId:string}) => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [fontSizes, setFontSizes] = useState<number[]>([])
+  const [company, setCompany] = useState<Company | null>(null)
+  const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
 
   const handleDateRangeClick = (months: number) => {
     const now = new Date()
@@ -126,43 +125,6 @@ const CompanyInfoCard = () => {
 
   return (
     <Flex flexDirection="column" gap={5}>
-      {/* 날짜 선택 */}
-      <Flex flexDirection="row" gap={4} width="full">
-        <Box p={3} borderRadius="lg" boxShadow="lg" w="4xl" backgroundColor="white">
-          <HStack gap={5}>
-            <Flex w="full" alignItems="center" gap={2}>
-              <MdCalendarMonth />
-              <Text minW="60px">시작일</Text>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={e => setStartDate(e.target.value)}
-                max={endDate}
-                variant="flushed"
-              />
-            </Flex>
-            <Flex w="full" alignItems="center" gap={2}>
-              <MdCalendarMonth />
-              <Text minW="60px">종료일</Text>
-              <Input
-                type="date"
-                value={endDate}
-                onChange={e => setEndDate(e.target.value)}
-                min={startDate}
-                variant="flushed"
-              />
-            </Flex>
-            {[1, 3, 6, 12].map(month => (
-              <Button
-                key={month}
-                borderRadius="xl"
-                onClick={() => handleDateRangeClick(month)}>
-                {month}개월
-              </Button>
-            ))}
-          </HStack>
-        </Box>
-      </Flex>
 
       {/* 기업 정보 및 차트 */}
       <Flex flexDirection="row" gap={4} width="full">
@@ -275,6 +237,7 @@ const CompanyInfoCard = () => {
                 </Box>
               </Box>
             </Box>
+            {/* 등급 변화 추이 그래프================================================================== */}
             <Box
               p={3}
               borderRadius="lg"
@@ -284,9 +247,8 @@ const CompanyInfoCard = () => {
               <Text fontSize="lg" fontWeight="bold">
                 ESG 등급 변화추이
               </Text>
-              <Separator size="lg" padding={1} w="100%" />
               <Box mt={4} width={'full'}>
-                <Line data={esgLineData} options={esgLineOptions} />
+                {orgId && <EsgLineData organizationId={orgId} />}{' '}
               </Box>
             </Box>
 
