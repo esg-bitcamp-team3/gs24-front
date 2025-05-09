@@ -16,41 +16,43 @@ import {
 import {useRouter} from 'next/navigation'
 import React from 'react'
 import {LuLogOut, LuSearch} from 'react-icons/lu'
-import axios from 'axios'
 import {useEffect, useState} from 'react'
+import { Company } from '../lib/api/interfaces/organizations'
+import { getOrganizations } from '@/lib/api/get'
 
 // 백엔드에서 받아온 회사 리스트의 타입을 정의
-interface Company {
-  companyCode: string
-  companyName: string
-}
 
 const Navbar: React.FC = () => {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [companyList, setCompanyList] = useState<Company[]>([])
+  const [isOpen, setIsOpen] = useState(false)
 
-  const isValidCompanyList = (data: any): data is Company[] => {
-    return (
-      Array.isArray(data) &&
-      data.every(item => typeof item.companyCode === 'string' && typeof item.companyName === 'string')
-    )
+  const handleCompanyClick = (companyId: string) => {
+    setIsOpen(false)
+    router.push(`/dashboard/companyInfo/${companyId}`)
   }
 
   const filteredCompanies =
     searchTerm === ''
       ? companyList
       : companyList.filter(company =>
-          company.companyName.trim().toLowerCase().includes(searchTerm.trim().toLowerCase())
+          company.companyName
+            .trim()
+            .toLowerCase()
+            .includes(searchTerm.trim().toLowerCase())
         )
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/organizations')
-      .then(res => {
-        console.log('📦 받아온 회사 리스트:', res.data)
-        setCompanyList(res.data)
-      })
-      .catch(err => console.error('❌ 오류 발생:', err))
+    const loadCompanies = async () => {
+      try {
+        const data = await getOrganizations()
+        setCompanyList(data)
+      } catch (error) {
+        console.error('Error fetching company list:', error)
+      }
+    }
+    loadCompanies()
   }, [])
 
   return (
@@ -69,9 +71,6 @@ const Navbar: React.FC = () => {
       height="65px" // 💡 높이도 명시적으로 주면 안정감 있어
     >
       <Box display="flex" paddingX="4" alignItems="center" width="10%">
-        {/* <Text fontWeight="bold" textStyle={'3xl'} color={'black'}>
-          GS24
-        </Text> */}
         <Image
           src="/logo.png"
           onClick={() => router.push('/dashboard')}
@@ -91,7 +90,7 @@ const Navbar: React.FC = () => {
           비교하기
         </Button>
         {/* 검색하기 버튼================================================================== */}
-        <Dialog.Root scrollBehavior={'inside'} placement="center">
+        <Dialog.Root open={isOpen} onOpenChange={(details) => setIsOpen(details.open)} scrollBehavior={'inside'} placement="center">
           <Dialog.Trigger asChild>
             <Button variant="outline" size="sm" padding={3}>
               <LuSearch />
@@ -122,13 +121,13 @@ const Navbar: React.FC = () => {
                     ) : (
                       filteredCompanies.map(company => (
                         <Button
-                          key={company.companyCode}
+                          key={company.id}
                           paddingLeft={3}
                           variant="ghost"
                           color="black"
                           justifyContent="flex-start"
                           onClick={() =>
-                            router.push(`/dashboard/companyInfo/${company.companyCode}`)
+                           handleCompanyClick(company.id)
                           }
                           w={'100%'}>
                           {company.companyName}
@@ -157,6 +156,7 @@ const Navbar: React.FC = () => {
         </div>
         {/* 나가기 버튼================================================================== */}
         <IconButton
+          marginEnd={3}
           variant="ghost"
           color="black"
           aria-label="Logout"
