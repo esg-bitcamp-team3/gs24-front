@@ -17,8 +17,10 @@ import {useRouter} from 'next/navigation'
 import React from 'react'
 import {LuLogOut, LuSearch} from 'react-icons/lu'
 import {useEffect, useState} from 'react'
-import { Company } from '../lib/api/interfaces/organizations'
-import { getOrganizations } from '@/lib/api/get'
+import {Company} from '../lib/api/interfaces/organizations'
+import {getOrganizations} from '@/lib/api/get'
+import {log} from 'console'
+import {logout} from '@/lib/api/auth'
 
 // 백엔드에서 받아온 회사 리스트의 타입을 정의
 
@@ -55,6 +57,11 @@ const Navbar: React.FC = () => {
     loadCompanies()
   }, [])
 
+  const logoutbtn = () => {
+    logout()
+    router.push('/')
+  }
+
   return (
     <Flex
       direction="row"
@@ -90,7 +97,11 @@ const Navbar: React.FC = () => {
           비교하기
         </Button>
         {/* 검색하기 버튼================================================================== */}
-        <Dialog.Root open={isOpen} onOpenChange={(details) => setIsOpen(details.open)} scrollBehavior={'inside'} placement="center">
+        <Dialog.Root
+          open={isOpen}
+          onOpenChange={details => setIsOpen(details.open)}
+          scrollBehavior={'inside'}
+          placement="center">
           <Dialog.Trigger asChild>
             <Button variant="outline" size="sm" padding={3}>
               <LuSearch />
@@ -126,9 +137,7 @@ const Navbar: React.FC = () => {
                           variant="ghost"
                           color="black"
                           justifyContent="flex-start"
-                          onClick={() =>
-                           handleCompanyClick(company.id)
-                          }
+                          onClick={() => handleCompanyClick(company.id)}
                           w={'100%'}>
                           {company.companyName}
                         </Button>
@@ -160,7 +169,7 @@ const Navbar: React.FC = () => {
           variant="ghost"
           color="black"
           aria-label="Logout"
-          onClick={() => router.push('/home')}>
+          onClick={() => logoutbtn()}>
           <LuLogOut />
         </IconButton>
       </Box>
