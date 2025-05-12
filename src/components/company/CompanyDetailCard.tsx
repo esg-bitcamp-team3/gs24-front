@@ -94,6 +94,18 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
   const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
 
+  useEffect(() => {
+    const companyinfo = async () => {
+      try {
+        const ciData = await getCompanyInfo(orgId)
+        if (ciData) setCompanyInfo(ciData || null)
+        else return null
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    companyinfo()
+  }, [])
   const handleDateRangeClick = (months: number) => {
     const now = new Date()
     const start = new Date()
@@ -122,20 +134,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   }
   const esgGrade = 'A'
   // const companyQuery = 'NAVER'
-
-  useEffect(() => {
-    const companyinfo = async () => {
-      try {
-        const ciData = await getCompanyInfo()
-
-        if (ciData) setCompanyInfo(ciData || null)
-        else return null
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-    companyinfo()
-  }, [])
 
   return (
     <Flex flexDirection="column" gap={5}>

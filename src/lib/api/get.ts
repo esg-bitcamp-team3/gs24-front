@@ -60,9 +60,9 @@ export async function getOrganizationRank() {
   }
 }
 
-export async function getCompanyInfo() {
+export async function getCompanyInfo(id: string) {
   try {
-    const response = await apiClient.get<CompanyInfo>('/companyInfo')
+    const response = await apiClient.get<CompanyInfo>(`/company/${id}`)
     return response.data
   } catch (error) {
     handleApiError(error, '기업 정보를 가져오는 데 실패했습니다.')

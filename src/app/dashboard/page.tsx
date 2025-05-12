@@ -96,20 +96,6 @@ export default function Dashboard() {
       }
     }
     fetchData()
-
-    // const organizationRank = async () => {
-    //   try {
-    //     const data = await getOrganizationRank()
-    //     if (data) {
-    //       setOrganizationRank(data || [])
-    //     } else {
-    //       return null
-    //     }
-    //   } catch (error) {
-    //     console.error('Error fetching data:', error)
-    //   }
-    // }
-    // organizationRank()
   }, [])
 
   return (
