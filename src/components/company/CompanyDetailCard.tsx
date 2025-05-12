@@ -11,8 +11,7 @@ import {
   VStack,
   Button,
   Badge,
-  Link
-  Grid,
+  Link,
   SimpleGrid
 } from '@chakra-ui/react'
 
@@ -44,7 +43,13 @@ import {EsgRatingResponse} from '@/lib/api/interfaces/esgRating'
 import {EsgLineData} from '@/components/chartDataImport'
 import {EsgBarData} from '../barChart'
 import {CompanyInfo} from '@/lib/api/interfaces/companyinfo'
-import {getCompanyInfo} from '@/lib/api/get'
+import {getCompanyInfo, getInterestOrganization} from '@/lib/api/get'
+import {postInteresrtOrganization} from '@/lib/api/post'
+import {deleteInterestOrganization} from '@/lib/api/delete'
+import {
+  OrganizationInfo,
+  OrganizationInfoResponse
+} from '@/lib/api/interfaces/interestOrganization'
 
 // 가짜 데이터
 const mockSummary = [
@@ -53,13 +58,11 @@ const mockSummary = [
   '노사관계와 관련한 이슈가 있었으나 빠르게 개선된 것으로 보입니다.'
 ]
 
-
 const keywordNews = [
   '삼성전자, 2분기 실적 발표 앞두고 투자자 기대감 커져',
   '친환경 반도체 공정 도입으로 ESG 평가 상승',
   '국내외 ESG 펀드 삼성전자 비중 확대'
 ]
-
 
 const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
@@ -67,22 +70,50 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
 
   const [fontSizes, setFontSizes] = useState<number[]>([])
   const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
-
   const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
   const [showMore, setShowMore] = useState(false)
+  const [ioCheck, setIoCheck] = useState<Boolean>(false)
 
   useEffect(() => {
-    const companyinfo = async () => {
+    const fetchData = async () => {
       try {
         const ciData = await getCompanyInfo(orgId)
         if (ciData) setCompanyInfo(ciData || null)
         else return null
+
+        const checkId = await getInterestOrganization()
+
+        if (
+          checkId?.organizationList.find((org: OrganizationInfo) => {
+            return org.organization.id === orgId
+          })
+        ) {
+          setIoCheck(true)
+        }
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
-    companyinfo()
+    fetchData()
   }, [])
+  const addButton = async () => {
+    try {
+      const data = await postInteresrtOrganization(orgId)
+      setIoCheck(true)
+      console.log('관심기업 등록 성공:', data)
+    } catch (error) {
+      console.error('관심기업 등록 실패:', error)
+    }
+  }
+  const deleteButton = async () => {
+    try {
+      const data = await deleteInterestOrganization(orgId)
+      setIoCheck(false)
+      console.log('관심기업 삭제 성공:', data)
+    } catch (error) {
+      console.error('관심기업 삭제 실패:', error)
+    }
+  }
   const handleDateRangeClick = (months: number) => {
     const now = new Date()
     const start = new Date()
@@ -141,6 +172,12 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
               <Text fontSize="lg" fontWeight="bold">
                 {companyinfo?.companyName}
               </Text>
+              <Button
+                color="black"
+                bg="white"
+                onClick={() => (ioCheck ? deleteButton() : addButton())}>
+                {ioCheck ? '관심기업 삭제하기' : '관심기업 추가하기'}
+              </Button>
             </Flex>
 
             <Separator variant="solid" size="lg" padding={1} w="full" />
@@ -289,7 +326,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
               ESG별 점수
             </Text>
             <Separator variant="solid" size="lg" padding={1} w="full" />
-            <SimpleGrid columns={3} >
+            <SimpleGrid columns={3}>
               {orgId && <EsgBarData organizationId={orgId} targetKey="E" />}
               {orgId && <EsgBarData organizationId={orgId} targetKey="S" />}
               {orgId && <EsgBarData organizationId={orgId} targetKey="G" />}

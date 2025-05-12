@@ -1,5 +1,6 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client'
+import Image from 'next/image'
+import styles from './page.module.css'
 
 export default function Home() {
   return (
@@ -25,13 +26,12 @@ export default function Home() {
             className={styles.primary}
             href="/login"
             target="_blank"
-            rel="noopener noreferrer"
-          >
+            rel="noopener noreferrer">
             로그인
           </a>
         </div>
       </main>
       <footer className={styles.footer}></footer>
     </div>
-  );
+  )
 }

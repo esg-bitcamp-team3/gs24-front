@@ -35,9 +35,11 @@ export async function logout() {
 
 export async function checkLogin() {
   try {
-    const response = await apiClient.get('/auth/session')
+    const response = await apiClient.get('/user/check')
+    console.log('checkLogin response:', response)
     return response.data
   } catch (error) {
-    handleApiError(error, '로그인이 필요합니다.')
+    // handleApiError(error, '로그인이 필요합니다.')
+    return false
   }
 }

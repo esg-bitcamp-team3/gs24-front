@@ -68,7 +68,7 @@ export const EsgBarData = ({
 
     d3.select(svgRef.current).selectAll('*').remove()
 
-    const margin = {top: 10, right: 15, bottom: 30, left:20}
+    const margin = {top: 10, right: 15, bottom: 30, left: 20}
     const width = 350 - margin.left - margin.right
     const height = 80 - margin.top - margin.bottom
 
@@ -129,14 +129,14 @@ export const EsgBarData = ({
       .attr('width', d => x(d.value))
       .attr('fill', d => colors[d.key])
 
-    // 텍스트 레이블 추가   
+    // 텍스트 레이블 추가
     svg
       .selectAll('.label')
       .data(data)
       .enter()
       .append('text')
       .attr('y', d => y(d.key)! + y.bandwidth() / 2 + 4)
-      .attr('x', d => x(d.value) + 3)  // 레이블 위치
+      .attr('x', d => x(d.value) + 3) // 레이블 위치
       .text(d => d.value)
       .style('font-size', '11px')
   }
