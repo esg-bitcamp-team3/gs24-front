@@ -10,7 +10,6 @@ import {
   Text,
   VStack,
   Button,
-  Badge,
   Badge
 } from '@chakra-ui/react'
 
@@ -25,10 +24,6 @@ import {
   Tooltip,
   Legend
 } from 'chart.js'
-
-// 차트 등록
-import {Line} from 'react-chartjs-2'
-import ESGWordCloud from '@/components/company/ESGWordCloud'
 
 ChartJS.register(
   CategoryScale,
@@ -114,44 +109,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
 
   return (
     <Flex flexDirection="column" gap={5}>
-      {/* 날짜 선택 */}
-      <Flex flexDirection="row" gap={4} width="full">
-        <Box p={3} borderRadius="lg" boxShadow="lg" w="4xl" backgroundColor="white">
-          <HStack gap={5}>
-            <Flex w="full" alignItems="center" gap={2}>
-              <MdCalendarMonth />
-              <Text minW="60px">시작일</Text>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={e => setStartDate(e.target.value)}
-                max={endDate}
-                variant="flushed"
-              />
-            </Flex>
-            <Flex w="full" alignItems="center" gap={2}>
-              <MdCalendarMonth />
-              <Text minW="60px">종료일</Text>
-              <Input
-                type="date"
-                value={endDate}
-                onChange={e => setEndDate(e.target.value)}
-                min={startDate}
-                variant="flushed"
-              />
-            </Flex>
-            {[1, 3, 6, 12].map(month => (
-              <Button
-                key={month}
-                borderRadius="xl"
-                onClick={() => handleDateRangeClick(month)}>
-                {month}개월
-              </Button>
-            ))}
-          </HStack>
-        </Box>
-      </Flex>
-
       {/* 기업 정보 및 ESG 등급 */}
       <Flex direction={{base: 'column', lg: 'row'}} gap={4} width="full">
         <Box
