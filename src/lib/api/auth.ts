@@ -1,11 +1,10 @@
 import {handleApiError} from '../util/handleApiError'
 import apiClient from './apiclient'
 import {LoginForm, SignupForm} from './interfaces/auth'
-import {Response} from './type'
 
 export async function signup(data: Partial<SignupForm>) {
   try {
-    const response = await apiClient.post<Response<string>>('/auth/signup', data)
+    const response = await apiClient.post<string>('/auth/signup', data)
     return response.data
   } catch (error) {
     handleApiError(error, '회원가입에 실패했습니다.')
@@ -14,7 +13,7 @@ export async function signup(data: Partial<SignupForm>) {
 
 export async function login(data: Partial<LoginForm>) {
   try {
-    const response = await apiClient.post<Response<string>>('/auth/login', data)
+    const response = await apiClient.post<string>('/auth/login', data)
     return response.data
   } catch (error: any) {
     if (error.response?.status === 401) {
@@ -27,7 +26,7 @@ export async function login(data: Partial<LoginForm>) {
 
 export async function logout() {
   try {
-    const response = await apiClient.post<Response<string>>('/auth/logout')
+    const response = await apiClient.post<string>('/auth/logout')
     return response.data
   } catch (error) {
     handleApiError(error, '로그아웃에 실패했습니다.')

@@ -10,9 +10,10 @@ import {
   Text,
   VStack,
   Button,
+  Badge,
   Badge
 } from '@chakra-ui/react'
-import {MdCalendarMonth} from 'react-icons/md'
+
 import React, {useState} from 'react'
 import {
   Chart as ChartJS,
@@ -24,6 +25,8 @@ import {
   Tooltip,
   Legend
 } from 'chart.js'
+
+// 차트 등록
 import {Line} from 'react-chartjs-2'
 import ESGWordCloud from '@/components/company/ESGWordCloud'
 
@@ -37,6 +40,12 @@ ChartJS.register(
   Legend
 )
 
+import ESGWordCloud from '@/components/company/ESGWordCloud'
+import {Company} from '@/lib/api/interfaces/organizations'
+import {EsgRatingResponse} from '@/lib/api/interfaces/esgRating'
+import {EsgLineData} from '@/components/chartDataImport'
+
+// 가짜 데이터
 const mockSummary = [
   '삼성전자는 ESG 측면에서 지속 가능한 경영활동을 강화하고 있으며...',
   '최근 반도체 산업 위기 속에서도 친환경 정책을 유지하고 있습니다.',
@@ -49,49 +58,44 @@ const keywordNews = [
   '국내외 ESG 펀드 삼성전자 비중 확대'
 ]
 
-const esgLineData = {
-  labels: ['2021', '2022', '2023', '2024', '2025'],
-  datasets: [
-    {
-      label: 'E (환경)',
-      data: [60, 65, 70, 68, 74],
-      borderColor: 'rgba(72, 187, 120, 1)',
-      backgroundColor: 'rgba(72, 187, 120, 0.2)',
-      fill: true,
-      tension: 0.4
-    },
-    {
-      label: 'S (사회)',
-      data: [55, 60, 62, 65, 67],
-      borderColor: 'rgba(66, 153, 225, 1)',
-      backgroundColor: 'rgba(66, 153, 225, 0.2)',
-      fill: true,
-      tension: 0.4
-    },
-    {
-      label: 'G (지배구조)',
-      data: [70, 72, 74, 76, 79],
-      borderColor: 'rgba(245, 101, 101, 1)',
-      backgroundColor: 'rgba(245, 101, 101, 0.2)',
-      fill: true,
-      tension: 0.4
-    }
-  ]
-}
+// ESG 차트 데이터
+// const esgLineData = {
+//   labels: ['2021', '2022', '2023', '2024', '2025'],
+//   datasets: [
+//     {
+//       label: 'E (환경)',
+//       data: [60, 65, 70, 68, 74],
+//       borderColor: 'rgba(72, 187, 120, 1)',
+//       backgroundColor: 'rgba(72, 187, 120, 0.2)',
+//       fill: true,
+//       tension: 0.4
+//     },
+//     {
+//       label: 'S (사회)',
+//       data: [55, 60, 62, 65, 67],
+//       borderColor: 'rgba(66, 153, 225, 1)',
+//       backgroundColor: 'rgba(66, 153, 225, 0.2)',
+//       fill: true,
+//       tension: 0.4
+//     },
+//     {
+//       label: 'G (지배구조)',
+//       data: [70, 72, 74, 76, 79],
+//       borderColor: 'rgba(245, 101, 101, 1)',
+//       backgroundColor: 'rgba(245, 101, 101, 0.2)',
+//       fill: true,
+//       tension: 0.4
+//     }
+//   ]
+// }
 
-const esgLineOptions = {
-  responsive: true,
-  plugins: {
-    legend: {position: 'top' as const},
-    title: {display: true, text: 'ESG 등급 변화 추이 (라인 그래프)'}
-  }
-}
-
-const CompanyInfoCard = () => {
+const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const esgGrade = 'A'
   const companyQuery = 'NAVER'
+  const [company, setCompany] = useState<Company | null>(null)
+  const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
 
   const handleDateRangeClick = (months: number) => {
     const now = new Date()
@@ -111,10 +115,10 @@ const CompanyInfoCard = () => {
   return (
     <Flex flexDirection="column" gap={5}>
       {/* 날짜 선택 */}
-      {/* <Flex direction={{base: 'column', md: 'row'}} gap={4} width="4xl" flexWrap="wrap">
-        <Box p={3} borderRadius="lg" boxShadow="lg" w="full" backgroundColor="white">
-          <HStack gap={5} flexWrap="wrap">
-            <Flex flex="1" alignItems="center" gap={2}>
+      <Flex flexDirection="row" gap={4} width="full">
+        <Box p={3} borderRadius="lg" boxShadow="lg" w="4xl" backgroundColor="white">
+          <HStack gap={5}>
+            <Flex w="full" alignItems="center" gap={2}>
               <MdCalendarMonth />
               <Text minW="60px">시작일</Text>
               <Input
@@ -125,7 +129,7 @@ const CompanyInfoCard = () => {
                 variant="flushed"
               />
             </Flex>
-            <Flex flex="1" alignItems="center" gap={2}>
+            <Flex w="full" alignItems="center" gap={2}>
               <MdCalendarMonth />
               <Text minW="60px">종료일</Text>
               <Input
@@ -146,7 +150,7 @@ const CompanyInfoCard = () => {
             ))}
           </HStack>
         </Box>
-      </Flex> */}
+      </Flex>
 
       {/* 기업 정보 및 ESG 등급 */}
       <Flex direction={{base: 'column', lg: 'row'}} gap={4} width="full">
@@ -242,14 +246,14 @@ const CompanyInfoCard = () => {
                 </Box>
               </VStack>
             </Box>
+            {/* 등급 변화 추이 그래프================================================================== */}
 
             <Box p={3} borderRadius="lg" boxShadow="lg" flex="2" backgroundColor="white">
               <Text fontSize="lg" fontWeight="bold">
                 ESG 등급 변화추이
               </Text>
-              <Separator size="lg" w="full" />
-              <Box mt={4}>
-                <Line data={esgLineData} options={esgLineOptions} />
+              <Box mt={4} width={'full'}>
+                {orgId && <EsgLineData organizationId={orgId} />}{' '}
               </Box>
             </Box>
 

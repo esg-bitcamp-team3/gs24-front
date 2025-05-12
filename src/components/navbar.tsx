@@ -8,23 +8,53 @@ import {
   Flex,
   IconButton,
   Input,
-  Text,
   Image,
   Dialog,
   Portal,
-  CloseButton
+  Text
 } from '@chakra-ui/react'
 import {useRouter} from 'next/navigation'
 import React from 'react'
 import {LuLogOut, LuSearch} from 'react-icons/lu'
+import {useEffect, useState} from 'react'
+import { Company } from '../lib/api/interfaces/organizations'
+import { getOrganizations } from '@/lib/api/get'
+
+// 백엔드에서 받아온 회사 리스트의 타입을 정의
 
 const Navbar: React.FC = () => {
   const router = useRouter()
-  const ref = React.useRef<HTMLInputElement>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [companyList, setCompanyList] = useState<Company[]>([])
+  const [isOpen, setIsOpen] = useState(false)
 
-  const handleClick = () => {
-    router.push('/dashboard/myPage')
+  const handleCompanyClick = (companyId: string) => {
+    setIsOpen(false)
+    router.push(`/dashboard/companyInfo/${companyId}`)
   }
+
+  const filteredCompanies =
+    searchTerm === ''
+      ? companyList
+      : companyList.filter(company =>
+          company.companyName
+            .trim()
+            .toLowerCase()
+            .includes(searchTerm.trim().toLowerCase())
+        )
+
+  useEffect(() => {
+    const loadCompanies = async () => {
+      try {
+        const data = await getOrganizations()
+        setCompanyList(data)
+      } catch (error) {
+        console.error('Error fetching company list:', error)
+      }
+    }
+    loadCompanies()
+  }, [])
+
   return (
     <Flex
       direction="row"
@@ -41,9 +71,6 @@ const Navbar: React.FC = () => {
       height="65px" // 💡 높이도 명시적으로 주면 안정감 있어
     >
       <Box display="flex" paddingX="4" alignItems="center" width="10%">
-        {/* <Text fontWeight="bold" textStyle={'3xl'} color={'black'}>
-          GS24
-        </Text> */}
         <Image
           src="/logo.png"
           onClick={() => router.push('/dashboard')}
@@ -63,56 +90,65 @@ const Navbar: React.FC = () => {
           비교하기
         </Button>
         {/* 검색하기 버튼================================================================== */}
-        <Dialog.Root scrollBehavior={'inside'} placement="center">
+        <Dialog.Root open={isOpen} onOpenChange={(details) => setIsOpen(details.open)} scrollBehavior={'inside'} placement="center">
           <Dialog.Trigger asChild>
             <Button variant="outline" size="sm" padding={3}>
               <LuSearch />
               Search
             </Button>
           </Dialog.Trigger>
+
           <Portal>
             <Dialog.Backdrop />
             <Dialog.Positioner>
               <Dialog.Content padding={4}>
                 <Dialog.Header>
-                  <Input paddingLeft={3} placeholder="search" />
+                  <Input
+                    paddingLeft={3}
+                    marginBottom={3}
+                    placeholder="search"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm((e.target as HTMLInputElement).value)}
+                  />
                 </Dialog.Header>
+
                 <Dialog.Body pt="4">
-                  <Box>
-                    <Button
-                      paddingLeft={3}
-                      variant="ghost"
-                      color="black"
-                      justifyContent="flex-start"
-                      onClick={() => router.push('/dashboard/companyCompare')}
-                      w={'100%'}>
-                      비교하기
-                    </Button>
+                  <Box height={300}>
+                    {filteredCompanies.length === 0 ? (
+                      <Text color="gray.500" textAlign="center">
+                        No companies found.
+                      </Text>
+                    ) : (
+                      filteredCompanies.map(company => (
+                        <Button
+                          key={company.id}
+                          paddingLeft={3}
+                          variant="ghost"
+                          color="black"
+                          justifyContent="flex-start"
+                          onClick={() =>
+                           handleCompanyClick(company.id)
+                          }
+                          w={'100%'}>
+                          {company.companyName}
+                        </Button>
+                      ))
+                    )}
                   </Box>
                 </Dialog.Body>
                 <Dialog.Footer>
-                <Dialog.ActionTrigger asChild>
-                <Button variant="outline">Close</Button>
-              </Dialog.ActionTrigger>
+                  <Dialog.ActionTrigger asChild>
+                    <Button variant="outline" marginTop={3} padding={3}>
+                      Close
+                    </Button>
+                  </Dialog.ActionTrigger>
                 </Dialog.Footer>
-                <Dialog.CloseTrigger top="0" insetEnd="-12" asChild>
-                  <CloseButton bg="bg" size="sm" />
-                </Dialog.CloseTrigger>
               </Dialog.Content>
             </Dialog.Positioner>
           </Portal>
         </Dialog.Root>
-
-        {/* <InputGroup flex="1" startElement={<LuSearch 
-          style={{
-            position: 'relative',  
-            left: '10px',            
-            fontSize: '1rem',     
-            color: 'gray.500',}} />}>
-          <Input placeholder="Search..." />
-        </InputGroup>       */}
         {/* 아바타================================================================== */}
-        <div onClick={handleClick} style={{cursor: 'pointer'}}>
+        <div onClick={() => router.push('/dashboard/myPage')} style={{cursor: 'pointer'}}>
           <Avatar.Root shape="full" size="lg">
             <Avatar.Fallback name="Segun Adebayo" />
             <Avatar.Image src="https://cdn.myanimelist.net/r/84x124/images/characters/9/131317.webp?s=d4b03c7291407bde303bc0758047f6bd" />
@@ -120,6 +156,7 @@ const Navbar: React.FC = () => {
         </div>
         {/* 나가기 버튼================================================================== */}
         <IconButton
+          marginEnd={3}
           variant="ghost"
           color="black"
           aria-label="Logout"
