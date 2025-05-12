@@ -88,7 +88,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const esgGrade = 'A'
-  const companyQuery = 'NAVER'
+  const companyQuery = 'NVIDIA'
   const [company, setCompany] = useState<Company | null>(null)
   const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
 
