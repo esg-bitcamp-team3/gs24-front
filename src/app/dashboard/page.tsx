@@ -66,34 +66,21 @@ export default function Dashboard() {
   const [organizationRank, setOrganizationRank] = useState<OrganizationRank[]>([])
 
   useEffect(() => {
-    const interestOrganization = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getInterestOrganization()
+        const ioData = await getInterestOrganization()
+        const orData = await getOrganizationRank()
 
-        if (data) {
-          setOrganizationList(data?.organizationList || [])
-        } else {
-          return null
-        }
+        if (ioData) setOrganizationList(ioData?.organizationList || [])
+        else return null
+
+        if (orData) setOrganizationRank(orData || [])
+        else return null
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
-    interestOrganization()
-
-    const organizationRank = async () => {
-      try {
-        const data = await getOrganizationRank()
-        if (data) {
-          setOrganizationRank(data || [])
-        } else {
-          return null
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-    organizationRank()
+    fetchData()
   }, [])
 
   interface CarbonItem {
