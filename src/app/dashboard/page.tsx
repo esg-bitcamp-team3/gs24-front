@@ -1,5 +1,7 @@
 'use client'
 
+'use client'
+
 import {
   Box,
   chakra,
@@ -11,6 +13,8 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react'
+import {BiCaretUp} from 'react-icons/bi'
+import axios from 'axios'
 import {Table} from '@chakra-ui/react'
 import React, {useState, useEffect, use} from 'react'
 import {GoPlus} from 'react-icons/go'
@@ -45,37 +49,18 @@ const rankitems = [
   {id: 4, name: '4', category: '네이버', rank1: 'B+', score1: '85'},
   {id: 5, name: '5', category: '이마트', rank1: 'B+', score1: '85'}
 ]
-const carbonitems = [
-  {
-    id: 1,
-    date: '2025/05/08',
-    price: '8,800',
-    compare: '800',
-    percent: '10%',
-    volume: '25,180'
-  },
-  {
-    id: 2,
-    date: '2025/05/07',
-    price: '8,000',
-    compare: '800',
-    percent: '10%',
-    volume: '32,180'
-  }
-]
+
+// 탄소 배출권 데이터 상태 추가
+
 const terms = [
   {
     term: '가명정보',
-    description:
-      '가명정보란 개인정보의 일부를 삭제·대체하는 등 개인을 알아볼 수 없도록 처리한 정보이다. 예를 들어 이름 홍길동을 이름 홍○○로 바꾼 것인데, 이는 개인 비식별 조치가 된 익명 개인정보와 식별 가능한 개인정보 사이의 중간 단계로 이해할 수 있다.'
-  },
-  {
-    term: '가상발전소',
-    subtitle: 'VPP, Virtual Power Plant',
-    description:
-      '가상발전소는 소규모 신재생에너지 발전과 에너지저장장치 등 분산형 에너지 자원(DER, Distributed Energy Resources)을 클라우드 기반으로 통합하여 하나의 발전소처럼 관리하는 시스템이다. 가상발전소는 분산 에너지를 수집·분석하여 전력 수급의 변수를 예측할 수 있어 에너지를 효율적으로 공급할 수 있다는 장점이 있다.'
+    english:
+      '가명정보란 개인정보의 일부를 삭제·대체하는 등 개인을 알아볼 수 없도록 처리한 정보이다. 예를 들어 이름 홍길동을 이름 홍○○로 바꾼 것인데, 이는 개인 비식별 조치가 된 익명 개인정보와 식별 가능한 개인정보 사이의 중간 단계로 이해할 수 있다.',
+    tags: []
   }
 ]
+
 export default function Dashboard() {
   const [organizationList, setOrganizationList] = useState<OrganizationInfo[]>([])
   const [organizationRank, setOrganizationRank] = useState<OrganizationRank[]>([])
@@ -111,6 +96,80 @@ export default function Dashboard() {
     organizationRank()
   }, [])
 
+  interface CarbonItem {
+    id: number
+    date: string
+    item_name: string
+    price: string
+    compare: string
+    percent: string
+    volume: string
+    total_value: string
+  }
+
+  const [carbonitems, setCarbonItems] = useState<CarbonItem[]>([])
+
+  const [carbonitems1, setCarbonItems1] = useState<CarbonItem[]>([])
+  const today = 20250508
+  const yesterday = 20250507
+
+  useEffect(() => {
+    const fetchCarbonData = async () => {
+      try {
+        const res2 = await axios.get(
+          `http://localhost:8000/api/market-price/carbon-price?basDt=${today}&itmsNm=KAU24`
+        )
+        const res1 = await axios.get(
+          `http://localhost:8000/api/market-price/carbon-price?basDt=${yesterday}&itmsNm=KAU24`
+        )
+
+        const transformData = (
+          data: {
+            basDt: string | any[]
+            itmsNm: any
+            clpr: any
+            vs: any
+            fltRt: any
+            trqu: any
+            trPrc: any
+          }[]
+        ) =>
+          data.map(
+            (
+              item: {
+                basDt: string | any[]
+                itmsNm: any
+                clpr: any
+                vs: any
+                fltRt: any
+                trqu: any
+                trPrc: any
+              },
+              index: number
+            ) => ({
+              id: index + 1,
+              date: `${item.basDt.slice(0, 4)}/${item.basDt.slice(
+                4,
+                6
+              )}/${item.basDt.slice(6, 8)}`,
+              item_name: item.itmsNm,
+              price: item.clpr,
+              compare: item.vs,
+              percent: item.fltRt,
+              volume: item.trqu,
+              total_value: item.trPrc
+            })
+          )
+
+        const mergedData = [...transformData(res2.data), ...transformData(res1.data)]
+        setCarbonItems(mergedData)
+      } catch (err) {
+        console.error('탄소 데이터 요청 오류:', err)
+      }
+    }
+
+    fetchCarbonData()
+  }, [])
   return (
     <Flex
       flexDirection={{base: 'column', xl: 'row'}}
@@ -278,56 +337,55 @@ export default function Dashboard() {
         </Box>
         <Flex flexDirection="column" gap={4} width="full">
           <Box
-            overflow={'hidden'}
+            overflowY="auto"
             p={5}
             borderRadius="lg"
             boxShadow="lg"
             width="full"
-            height="170px"
+            maxHeight="170px"
             backgroundColor="white">
-            <Text fontSize="lg" fontWeight="bold" mb={3}>
-              탄소 배출권 시세
-            </Text>
+            <Box position="sticky" top={0} zIndex={1} backgroundColor="white" p={5}>
+              <Text fontSize="lg" fontWeight="bold" mb={3}>
+                탄소 배출권 시세
+              </Text>
+              <Separator size="lg" padding={1} w="full" />
+            </Box>
+
             <Separator size="lg" padding={1} w="full" />
             <Table.Root size="sm">
               <Table.Header>
                 <Table.Row>
-                  <Table.ColumnHeader fontWeight="bold" textAlign="center">
-                    {' '}
-                    날짜
-                  </Table.ColumnHeader>
-                  <Table.ColumnHeader fontWeight="bold" textAlign="center">
-                    종가
-                  </Table.ColumnHeader>
-                  <Table.ColumnHeader fontWeight="bold" textAlign="center">
-                    대비
-                  </Table.ColumnHeader>
-                  <Table.ColumnHeader fontWeight="bold" textAlign="center">
-                    등락율(%)
-                  </Table.ColumnHeader>
-                  <Table.ColumnHeader fontWeight="bold" textAlign="center">
-                    거래량
-                  </Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="center">날짜</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="center">종목명</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="center">종가</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="center">대비</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="center">등락율(%)</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="center">거래량</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="center">거래대금</Table.ColumnHeader>
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                {carbonitems.map(carbonitems => (
-                  <Table.Row key={carbonitems.id}>
-                    <Table.Cell p={2} textAlign="center">
-                      {carbonitems.date}
-                    </Table.Cell>
-                    <Table.Cell p={2} textAlign="center">
-                      {carbonitems.price}
-                    </Table.Cell>
-                    <Table.Cell p={2} textAlign="center">
-                      {carbonitems.compare}
-                    </Table.Cell>
-                    <Table.Cell p={2} textAlign="center">
-                      {carbonitems.percent}
-                    </Table.Cell>
-                    <Table.Cell p={2} textAlign="center">
-                      {carbonitems.volume}
-                    </Table.Cell>
+                {carbonitems1.map((item, i) => (
+                  <Table.Row key={i}>
+                    <Table.Cell textAlign="center">{item.date}</Table.Cell>
+
+                    <Table.Cell textAlign="center">{item.item_name}</Table.Cell>
+                    <Table.Cell textAlign="center">{item.price}</Table.Cell>
+                    <Table.Cell textAlign="center">{item.compare}</Table.Cell>
+                    <Table.Cell textAlign="center">{item.percent}</Table.Cell>
+                    <Table.Cell textAlign="center">{item.volume}</Table.Cell>
+                    <Table.Cell textAlign="center">{item.total_value}</Table.Cell>
+                  </Table.Row>
+                ))}
+                {carbonitems.map((item, i) => (
+                  <Table.Row key={i}>
+                    <Table.Cell textAlign="center">{item.date}</Table.Cell>
+                    <Table.Cell textAlign="center">{item.item_name}</Table.Cell>
+                    <Table.Cell textAlign="center">{item.price}</Table.Cell>
+                    <Table.Cell textAlign="center">{item.compare}</Table.Cell>
+                    <Table.Cell textAlign="center">{item.percent}</Table.Cell>
+                    <Table.Cell textAlign="center">{item.volume}</Table.Cell>
+                    <Table.Cell textAlign="center">{item.total_value}</Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>
@@ -353,8 +411,8 @@ export default function Dashboard() {
               {terms.map((item, i) => (
                 <div key={i}>
                   <Text fontWeight="bold">{item.term}</Text>
-                  {item.subtitle && <Text>{item.subtitle}</Text>}
-                  <Text>{item.description}</Text>
+                  {item.term && <Text>{item.term}</Text>}
+                  <Text>{item.english}</Text>
                 </div>
               ))}
             </div>
