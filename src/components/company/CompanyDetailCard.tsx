@@ -11,12 +11,11 @@ import {
   VStack,
   Button,
   Badge,
-  Link
-  Grid,
+  Link,
   SimpleGrid
 } from '@chakra-ui/react'
 
-import React, {useEffect, useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -59,13 +58,11 @@ const mockSummary = [
   '노사관계와 관련한 이슈가 있었으나 빠르게 개선된 것으로 보입니다.'
 ]
 
-
 const keywordNews = [
   '삼성전자, 2분기 실적 발표 앞두고 투자자 기대감 커져',
   '친환경 반도체 공정 도입으로 ESG 평가 상승',
   '국내외 ESG 펀드 삼성전자 비중 확대'
 ]
-
 
 const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
@@ -329,7 +326,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
               ESG별 점수
             </Text>
             <Separator variant="solid" size="lg" padding={1} w="full" />
-            <SimpleGrid columns={3} >
+            <SimpleGrid columns={3}>
               {orgId && <EsgBarData organizationId={orgId} targetKey="E" />}
               {orgId && <EsgBarData organizationId={orgId} targetKey="S" />}
               {orgId && <EsgBarData organizationId={orgId} targetKey="G" />}
