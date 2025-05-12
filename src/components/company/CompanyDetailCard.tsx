@@ -13,7 +13,7 @@ import {
   Badge
 } from '@chakra-ui/react'
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -39,6 +39,8 @@ import ESGWordCloud from '@/components/company/ESGWordCloud'
 import {Company} from '@/lib/api/interfaces/organizations'
 import {EsgRatingResponse} from '@/lib/api/interfaces/esgRating'
 import {EsgLineData} from '@/components/chartDataImport'
+import {CompanyInfo} from '@/lib/api/interfaces/companyinfo'
+import {getCompanyInfo} from '@/lib/api/get'
 
 // 가짜 데이터
 const mockSummary = [
@@ -87,11 +89,24 @@ const keywordNews = [
 const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const esgGrade = 'A'
-  const companyQuery = 'NVIDIA'
-  const [company, setCompany] = useState<Company | null>(null)
+
+  const [fontSizes, setFontSizes] = useState<number[]>([])
+  const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
+
   const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
 
+  useEffect(() => {
+    const companyinfo = async () => {
+      try {
+        const ciData = await getCompanyInfo(orgId)
+        if (ciData) setCompanyInfo(ciData || null)
+        else return null
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    companyinfo()
+  }, [])
   const handleDateRangeClick = (months: number) => {
     const now = new Date()
     const start = new Date()
@@ -107,49 +122,156 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
     return 'red'
   }
 
+  const ESGGradeBadge = ({grade}: {grade: string}) => {
+    return (
+      <Badge
+        colorScheme={getGradeColor(grade)}
+        fontSize="lg"
+        px={4}
+        py={1}
+        borderRadius="md">
+        {grade}
+      </Badge>
+    )
+  }
+  const esgGrade = 'A'
+  // const companyQuery = 'NAVER'
+
   return (
     <Flex flexDirection="column" gap={5}>
-      {/* 기업 정보 및 ESG 등급 */}
-      <Flex direction={{base: 'column', lg: 'row'}} gap={4} width="full">
-        <Box
-          p={3}
-          borderRadius="lg"
-          boxShadow="lg"
-          w={{base: '100%', lg: '30%'}}
-          backgroundColor="white">
-          <VStack align="start" px="6" gap={4}>
-            <Text fontSize="lg" fontWeight="bold">
-              {companyQuery}
-            </Text>
-            <Separator variant="solid" size="lg" w="full" />
-            <DataList.Root orientation="vertical">
+      {/* 기업 정보 및 차트 */}
+      <Flex flexDirection="row" gap={4} width="full">
+        <Box p={3} borderRadius="lg" boxShadow="lg" w="md" backgroundColor="white">
+          <VStack align="center" px="6" width="full" height="full">
+            <Flex w="full" flexDirection="row" justify="space-between">
+              <Text fontSize="lg" fontWeight="bold">
+                {companyinfo?.companyName}
+              </Text>
+            </Flex>
+
+            <Separator variant="solid" size="lg" padding={1} w="full" />
+            <DataList.Root orientation="horizontal">
+              {/* 기업 정보 */}
               <DataList.Item>
-                <DataList.ItemLabel fontSize="sm">업종</DataList.ItemLabel>
-                <DataList.ItemValue fontSize="sm">전자/반도체</DataList.ItemValue>
-              </DataList.Item>
-              <DataList.Item>
-                <DataList.ItemLabel fontSize="sm">자본금</DataList.ItemLabel>
-                <DataList.ItemValue fontSize="sm">8,975억원</DataList.ItemValue>
-              </DataList.Item>
-              <DataList.Item>
-                <DataList.ItemLabel fontSize="sm">대표자</DataList.ItemLabel>
-                <DataList.ItemValue fontSize="sm">
-                  김기남, 한종희, 경계현
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  업종
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  {companyinfo?.industry}
                 </DataList.ItemValue>
               </DataList.Item>
+
               <DataList.Item>
-                <DataList.ItemLabel fontSize="sm">주소</DataList.ItemLabel>
-                <DataList.ItemValue fontSize="sm">
-                  경기도 수원시 영통구 삼성로 129
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  임직원수
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  {companyinfo?.numberOfEmployees}
                 </DataList.ItemValue>
               </DataList.Item>
+
               <DataList.Item>
-                <DataList.ItemLabel fontSize="sm">임직원수</DataList.ItemLabel>
-                <DataList.ItemValue fontSize="sm">117,904명</DataList.ItemValue>
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  기업 구분
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  {companyinfo?.companyType}
+                </DataList.ItemValue>
               </DataList.Item>
+
               <DataList.Item>
-                <DataList.ItemLabel fontSize="sm">전화번호</DataList.ItemLabel>
-                <DataList.ItemValue fontSize="sm">02-2255-0114</DataList.ItemValue>
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  설립일
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  {companyinfo?.establishmentDate}
+                </DataList.ItemValue>
+              </DataList.Item>
+
+              <DataList.Item>
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  자본금
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  {companyinfo?.capital}
+                </DataList.ItemValue>
+              </DataList.Item>
+
+              <DataList.Item>
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  대표자
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  {companyinfo?.ceoName}
+                </DataList.ItemValue>
+              </DataList.Item>
+
+              <DataList.Item>
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  대졸 초임
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  {companyinfo?.graduateSalary}
+                </DataList.ItemValue>
+              </DataList.Item>
+
+              <DataList.Item>
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  주요 사업
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  {companyinfo?.mainBusiness}
+                </DataList.ItemValue>
+              </DataList.Item>
+
+              <DataList.Item>
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  4대 보험 가입 여부
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  {companyinfo?.hasFourInsurances}
+                </DataList.ItemValue>
+              </DataList.Item>
+
+              <DataList.Item>
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  홈페이지
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  <a
+                    href={companyinfo?.homepage}
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    {companyinfo?.homepage}
+                  </a>
+                </DataList.ItemValue>
+              </DataList.Item>
+
+              <DataList.Item>
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  본사 주소
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  {companyinfo?.address}
+                </DataList.ItemValue>
+              </DataList.Item>
+
+              <DataList.Item>
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  계열사 목록
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  {companyinfo?.affiliates?.join(', ')}
+                </DataList.ItemValue>
+              </DataList.Item>
+
+              <DataList.Item>
+                <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                  매출액
+                </DataList.ItemLabel>
+                <DataList.ItemValue fontSize="small">
+                  {companyinfo?.revenue}
+                </DataList.ItemValue>
               </DataList.Item>
             </DataList.Root>
           </VStack>
@@ -243,12 +365,14 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
           flexDirection="column"
           justifyContent="center"
           alignItems="center">
-          <Text fontSize="lg" fontWeight="bold">
-            기업 관련 키워드
-          </Text>
-          <Box w="100%" maxW="600px" h="300px" overflow="hidden">
-            <ESGWordCloud query={companyQuery} />
-          </Box>
+          <VStack align="center" px="1" width="1340px" height="full">
+            <Text fontSize="lg" fontWeight="bold">
+              기업 관련 키워드
+            </Text>
+            <Box w="600px" h="300px" overflow="hidden">
+              <ESGWordCloud query={companyinfo?.companyName || ''} />
+            </Box>
+          </VStack>
         </Box>
 
         <Box
