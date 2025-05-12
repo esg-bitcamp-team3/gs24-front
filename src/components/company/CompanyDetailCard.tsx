@@ -11,11 +11,12 @@ import {
   VStack,
   Button,
   Badge,
+  Link
   Grid,
   SimpleGrid
 } from '@chakra-ui/react'
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -52,11 +53,13 @@ const mockSummary = [
   '노사관계와 관련한 이슈가 있었으나 빠르게 개선된 것으로 보입니다.'
 ]
 
+
 const keywordNews = [
   '삼성전자, 2분기 실적 발표 앞두고 투자자 기대감 커져',
   '친환경 반도체 공정 도입으로 ESG 평가 상승',
   '국내외 ESG 펀드 삼성전자 비중 확대'
 ]
+
 
 const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
@@ -66,6 +69,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
 
   const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
+  const [showMore, setShowMore] = useState(false)
 
   useEffect(() => {
     const companyinfo = async () => {
@@ -107,13 +111,31 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
     )
   }
   const esgGrade = 'A'
-  // const companyQuery = 'NAVER'
+  function handleWordClick(event: any, word: any): void {
+    throw new Error('Function not implemented.')
+  }
+  const [keywordNews, setKeywordNews] = useState<{title: string; link: string}[]>([])
+  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null)
 
+  const handleNewsUpdate = (
+    newsList: {title: string; link: string}[],
+    keyword: string
+  ) => {
+    console.log('🔥 부모가 받은 뉴스:', newsList, keyword)
+    setKeywordNews(newsList)
+    setSelectedKeyword(keyword)
+  }
   return (
     <Flex flexDirection="column" gap={5}>
       {/* 기업 정보 및 차트 */}
       <Flex flexDirection="row" gap={4} width="full">
-        <Box p={3} borderRadius="lg" boxShadow="lg" w="md" backgroundColor="white">
+        <Box
+          p={3}
+          borderRadius="lg"
+          boxShadow="lg"
+          w="md"
+          backgroundColor="white"
+          position="relative">
           <VStack align="center" px="6" width="full" height="full">
             <Flex w="full" flexDirection="row" justify="space-between">
               <Text fontSize="lg" fontWeight="bold">
@@ -123,7 +145,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
 
             <Separator variant="solid" size="lg" padding={1} w="full" />
             <DataList.Root orientation="horizontal">
-              {/* 기업 정보 */}
+              {/* 기업 정보 */}{' '}
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   업종
@@ -132,7 +154,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.industry}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   임직원수
@@ -141,7 +162,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.numberOfEmployees}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   기업 구분
@@ -150,7 +170,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.companyType}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   설립일
@@ -159,7 +178,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.establishmentDate}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   자본금
@@ -168,7 +186,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.capital}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   대표자
@@ -177,7 +194,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.ceoName}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   대졸 초임
@@ -186,7 +202,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.graduateSalary}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   주요 사업
@@ -195,7 +210,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.mainBusiness}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   4대 보험 가입 여부
@@ -204,7 +218,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.hasFourInsurances}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   홈페이지
@@ -215,37 +228,58 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                     target="_blank"
                     rel="noopener noreferrer">
                     {companyinfo?.homepage}
-                  </a>
+                  </a>{' '}
                 </DataList.ItemValue>
               </DataList.Item>
-
-              <DataList.Item>
-                <DataList.ItemLabel fontSize="small" fontWeight="bold">
-                  본사 주소
-                </DataList.ItemLabel>
-                <DataList.ItemValue fontSize="small">
-                  {companyinfo?.address}
-                </DataList.ItemValue>
-              </DataList.Item>
-
-              <DataList.Item>
-                <DataList.ItemLabel fontSize="small" fontWeight="bold">
-                  계열사 목록
-                </DataList.ItemLabel>
-                <DataList.ItemValue fontSize="small">
-                  {companyinfo?.affiliates?.join(', ')}
-                </DataList.ItemValue>
-              </DataList.Item>
-
-              <DataList.Item>
-                <DataList.ItemLabel fontSize="small" fontWeight="bold">
-                  매출액
-                </DataList.ItemLabel>
-                <DataList.ItemValue fontSize="small">
-                  {companyinfo?.revenue}
-                </DataList.ItemValue>
-              </DataList.Item>
+              <Button size="sm" variant="outline" onClick={() => setShowMore(!showMore)}>
+                {showMore ? '접기' : '더보기'}
+              </Button>
             </DataList.Root>
+
+            <Box mt={3} w="full">
+              {showMore && (
+                <Box
+                  position="absolute"
+                  top="95%" // 박스 아래쪽에 겹쳐서
+                  left={0}
+                  mt={-2}
+                  zIndex={10}
+                  background="white"
+                  borderRadius="md"
+                  boxShadow="xl"
+                  p={10}
+                  w="100%">
+                  <DataList.Root orientation="horizontal">
+                    <DataList.Item>
+                      <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                        본사 주소
+                      </DataList.ItemLabel>
+                      <DataList.ItemValue fontSize="small">
+                        {companyinfo?.address}
+                      </DataList.ItemValue>
+                    </DataList.Item>
+
+                    <DataList.Item>
+                      <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                        계열사 목록
+                      </DataList.ItemLabel>
+                      <DataList.ItemValue fontSize="small">
+                        {companyinfo?.affiliates?.join(', ')}
+                      </DataList.ItemValue>
+                    </DataList.Item>
+
+                    <DataList.Item>
+                      <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                        매출액
+                      </DataList.ItemLabel>
+                      <DataList.ItemValue fontSize="small">
+                        {companyinfo?.revenue}
+                      </DataList.ItemValue>
+                    </DataList.Item>
+                  </DataList.Root>
+                </Box>
+              )}
+            </Box>
           </VStack>
         </Box>
 
@@ -348,11 +382,13 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
               기업 관련 키워드
             </Text>
             <Box w="600px" h="300px" overflow="hidden">
-              <ESGWordCloud query={companyinfo?.companyName || ''} />
+              <ESGWordCloud
+                query={companyinfo?.companyName || ''}
+                onNewsUpdate={handleNewsUpdate}
+              />
             </Box>
           </VStack>
         </Box>
-
         <Box
           p={3}
           borderRadius="lg"
@@ -361,14 +397,19 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
           backgroundColor="white"
           h="auto">
           <Text fontSize="lg" fontWeight="bold">
-            키워드 관련 뉴스
+            키워드 관련 뉴스 {selectedKeyword && `: ${selectedKeyword}`}
           </Text>
           <Separator size="lg" w="full" />
           <VStack align="start" mt={2}>
             {keywordNews.map((news, idx) => (
-              <Text key={idx} fontSize="sm" color="gray.700">
-                • {news}
-              </Text>
+              <a
+                key={idx}
+                href={news.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{fontSize: '14px', color: 'black', textDecoration: 'underline'}}>
+                • {news.title}
+              </a>
             ))}
           </VStack>
         </Box>
