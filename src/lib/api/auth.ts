@@ -1,6 +1,7 @@
+
 import {handleApiError} from '../util/handleApiError'
 import apiClient from './apiclient'
-import {LoginForm, SignupForm} from './interfaces/auth'
+import {LoginForm, SignupForm, UpdateUser, User} from './interfaces/auth'
 
 export async function signup(data: Partial<SignupForm>) {
   try {
@@ -35,9 +36,30 @@ export async function logout() {
 
 export async function checkLogin() {
   try {
-    const response = await apiClient.get('/auth/session')
+    const response = await apiClient.get('/auth/session', { withCredentials: true })    // 세션 쿠키를 자동으로 보냄
     return response.data
   } catch (error) {
     handleApiError(error, '로그인이 필요합니다.')
+  }
+}
+
+
+export async function getUserInfo() {
+  try {
+    const response = await apiClient.get<User>(`/auth/mypage`)
+    return response.data
+  } catch (error) {
+      handleApiError(error, '로그인이 필요합니다.')
+  }
+}
+
+export async function updateUserInfo(data: Partial<UpdateUser>) {
+  try {
+    const response = await apiClient.patch<string>('/user', data)
+    console.log(response);
+    return response.data;
+
+  } catch (error) {
+    handleApiError(error, '수정 실패')
   }
 }

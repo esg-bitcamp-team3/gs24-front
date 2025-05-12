@@ -18,3 +18,9 @@ export interface User {
   email: string
   phone: string
 }
+
+export interface UpdateUser {
+  name: string
+  phone: string
+  password: string
+}
