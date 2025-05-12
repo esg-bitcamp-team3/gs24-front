@@ -12,6 +12,8 @@ import {
   Button,
   Badge,
   Link
+  Grid,
+  SimpleGrid
 } from '@chakra-ui/react'
 
 import React, {useEffect, useState} from 'react'
@@ -40,6 +42,7 @@ import ESGWordCloud from '@/components/company/ESGWordCloud'
 import {Company} from '@/lib/api/interfaces/organizations'
 import {EsgRatingResponse} from '@/lib/api/interfaces/esgRating'
 import {EsgLineData} from '@/components/chartDataImport'
+import {EsgBarData} from '../barChart'
 import {CompanyInfo} from '@/lib/api/interfaces/companyinfo'
 import {getCompanyInfo} from '@/lib/api/get'
 
@@ -50,36 +53,13 @@ const mockSummary = [
   '노사관계와 관련한 이슈가 있었으나 빠르게 개선된 것으로 보입니다.'
 ]
 
-// ESG 차트 데이터
-// const esgLineData = {
-//   labels: ['2021', '2022', '2023', '2024', '2025'],
-//   datasets: [
-//     {
-//       label: 'E (환경)',
-//       data: [60, 65, 70, 68, 74],
-//       borderColor: 'rgba(72, 187, 120, 1)',
-//       backgroundColor: 'rgba(72, 187, 120, 0.2)',
-//       fill: true,
-//       tension: 0.4
-//     },
-//     {
-//       label: 'S (사회)',
-//       data: [55, 60, 62, 65, 67],
-//       borderColor: 'rgba(66, 153, 225, 1)',
-//       backgroundColor: 'rgba(66, 153, 225, 0.2)',
-//       fill: true,
-//       tension: 0.4
-//     },
-//     {
-//       label: 'G (지배구조)',
-//       data: [70, 72, 74, 76, 79],
-//       borderColor: 'rgba(245, 101, 101, 1)',
-//       backgroundColor: 'rgba(245, 101, 101, 0.2)',
-//       fill: true,
-//       tension: 0.4
-//     }
-//   ]
-// }
+
+const keywordNews = [
+  '삼성전자, 2분기 실적 발표 앞두고 투자자 기대감 커져',
+  '친환경 반도체 공정 도입으로 ESG 평가 상승',
+  '국내외 ESG 펀드 삼성전자 비중 확대'
+]
+
 
 const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
@@ -308,6 +288,12 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
             <Text fontSize="lg" fontWeight="bold">
               ESG별 점수
             </Text>
+            <Separator variant="solid" size="lg" padding={1} w="full" />
+            <SimpleGrid columns={3} >
+              {orgId && <EsgBarData organizationId={orgId} targetKey="E" />}
+              {orgId && <EsgBarData organizationId={orgId} targetKey="S" />}
+              {orgId && <EsgBarData organizationId={orgId} targetKey="G" />}
+            </SimpleGrid>
             <Separator variant="solid" size="lg" w="full" />
           </Box>
 
