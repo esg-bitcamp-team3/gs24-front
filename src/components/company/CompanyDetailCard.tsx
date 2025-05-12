@@ -10,7 +10,9 @@ import {
   Text,
   VStack,
   Button,
-  Badge
+  Badge,
+  Grid,
+  SimpleGrid
 } from '@chakra-ui/react'
 
 import React, {useState, useEffect} from 'react'
@@ -25,22 +27,22 @@ import {
   Legend
 } from 'chart.js'
 
-// 차트 등록
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend
-)
-
+// // 차트 등록
+// ChartJS.register(
+//   CategoryScale,
+//   LinearScale,
+//   LineElement,
+//   PointElement,
+//   Title,
+//   Tooltip,
+//   Legend
+// )
 
 import ESGWordCloud from '@/components/company/ESGWordCloud'
 import {Company} from '@/lib/api/interfaces/organizations'
 import {EsgRatingResponse} from '@/lib/api/interfaces/esgRating'
 import {EsgLineData} from '@/components/chartDataImport'
+import {EsgBarData} from '../barChart'
 
 // 가짜 데이터
 const mockSummary = [
@@ -55,39 +57,7 @@ const keywordNews = [
   '국내외 ESG 펀드 삼성전자 비중 확대'
 ]
 
-// ESG 차트 데이터
-// const esgLineData = {
-//   labels: ['2021', '2022', '2023', '2024', '2025'],
-//   datasets: [
-//     {
-//       label: 'E (환경)',
-//       data: [60, 65, 70, 68, 74],
-//       borderColor: 'rgba(72, 187, 120, 1)',
-//       backgroundColor: 'rgba(72, 187, 120, 0.2)',
-//       fill: true,
-//       tension: 0.4
-//     },
-//     {
-//       label: 'S (사회)',
-//       data: [55, 60, 62, 65, 67],
-//       borderColor: 'rgba(66, 153, 225, 1)',
-//       backgroundColor: 'rgba(66, 153, 225, 0.2)',
-//       fill: true,
-//       tension: 0.4
-//     },
-//     {
-//       label: 'G (지배구조)',
-//       data: [70, 72, 74, 76, 79],
-//       borderColor: 'rgba(245, 101, 101, 1)',
-//       backgroundColor: 'rgba(245, 101, 101, 0.2)',
-//       fill: true,
-//       tension: 0.4
-//     }
-//   ]
-// }
-
-
-const CompanyInfoCard = ({orgId}: {orgId:string}) => {
+const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [fontSizes, setFontSizes] = useState<number[]>([])
@@ -125,7 +95,6 @@ const CompanyInfoCard = ({orgId}: {orgId:string}) => {
 
   return (
     <Flex flexDirection="column" gap={5}>
-
       {/* 기업 정보 및 차트 */}
       <Flex flexDirection="row" gap={4} width="full">
         <Box p={3} borderRadius="lg" boxShadow="lg" w="md" backgroundColor="white">
@@ -187,6 +156,11 @@ const CompanyInfoCard = ({orgId}: {orgId:string}) => {
               ESG별 점수
             </Text>
             <Separator variant="solid" size="lg" padding={1} w="full" />
+            <SimpleGrid columns={3} >
+              {orgId && <EsgBarData organizationId={orgId} targetKey="E" />}
+              {orgId && <EsgBarData organizationId={orgId} targetKey="S" />}
+              {orgId && <EsgBarData organizationId={orgId} targetKey="G" />}
+            </SimpleGrid>
           </Box>
           {/* ESG 섹션 */}
           <Flex flexDirection="row" gap={4} width="full">
