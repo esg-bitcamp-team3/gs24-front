@@ -9,12 +9,9 @@ import {
   VStack,
   Badge,
   Link,
-<<<<<<< HEAD
-  Table
-=======
-  SimpleGrid,
-  Button
->>>>>>> 7c3c8d636a750d265ea31b39bf69dbbfae322ab8
+  Table,
+  Button,
+  SimpleGrid
 } from '@chakra-ui/react'
 
 import React, {useEffect, useState} from 'react'
@@ -75,7 +72,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
   const [showMore, setShowMore] = useState(false)
   const [ioCheck, setIoCheck] = useState<Boolean>(false)
-
 
   useEffect(() => {
     const fetchData = async () => {

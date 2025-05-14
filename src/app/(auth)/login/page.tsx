@@ -53,12 +53,7 @@ const LoginPage = () => {
       minH="100vh" // 화면 전체 높이
       justify="center" // 수평 중앙
       align="center" // 수직 중앙
-<<<<<<< HEAD
       bg="  linear-gradient(-225deg, #FFFEFF 0%, #D7FFFE 100%)">
-=======
-       bg="  linear-gradient(-225deg, #FFFEFF 0%, #D7FFFE 100%)"
-    >
->>>>>>> 7c3c8d636a750d265ea31b39bf69dbbfae322ab8
       <Card.Root
         boxAlign={'center'}
         display="flex"
