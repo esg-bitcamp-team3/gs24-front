@@ -9,8 +9,9 @@ import {
   VStack,
   Badge,
   Link,
-  SimpleGrid,
-  Button
+  Table,
+  Button,
+  SimpleGrid
 } from '@chakra-ui/react'
 
 import React, {useEffect, useState} from 'react'
@@ -71,7 +72,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
   const [showMore, setShowMore] = useState(false)
   const [ioCheck, setIoCheck] = useState<Boolean>(false)
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -145,6 +145,9 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
     throw new Error('Function not implemented.')
   }
   const [keywordNews, setKeywordNews] = useState<{title: string; link: string}[]>([])
+  const [organizationRank, setOrganizationRank] = useState<
+    {organizationName: string; esgGrade: string; esgScore: number}[]
+  >([])
   const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null)
 
   const handleNewsUpdate = (
@@ -386,16 +389,10 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
 
             <Box p={3} borderRadius="lg" boxShadow="lg" flex="2" backgroundColor="white">
               <Text fontSize="lg" fontWeight="bold">
-                AI 뉴스 요약
+                주식가격
               </Text>
               <Separator size="lg" w="full" />
-              <VStack align="start" mt={2}>
-                {mockSummary.map((line, idx) => (
-                  <Text key={idx} fontSize="sm" color="gray.700">
-                    • {line}
-                  </Text>
-                ))}
-              </VStack>
+              <VStack align="start" mt={2}></VStack>
             </Box>
           </Flex>
         </Flex>
