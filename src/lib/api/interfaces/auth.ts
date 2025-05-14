@@ -22,5 +22,4 @@ export interface User {
 export interface UpdateUser {
   name: string
   phone: string
-  password: string
 }

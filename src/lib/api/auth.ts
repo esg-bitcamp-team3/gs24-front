@@ -43,10 +43,9 @@ export async function checkLogin() {
   }
 }
 
-
 export async function getUserInfo() {
   try {
-    const response = await apiClient.get<User>(`/auth/mypage`)
+    const response = await apiClient.get<User>(`/user/mypage`)
     return response.data
   } catch (error) {
       handleApiError(error, '로그인이 필요합니다.')
@@ -56,10 +55,32 @@ export async function getUserInfo() {
 export async function updateUserInfo(data: Partial<UpdateUser>) {
   try {
     const response = await apiClient.patch<string>('/user', data)
-    console.log(response);
-    return response.data;
+    console.log(response)
+    return response.data
 
   } catch (error) {
     handleApiError(error, '수정 실패')
+  }
+}
+
+interface checkingPassword {
+  password: string
+}
+
+export async function checkingPassword(data: checkingPassword) {
+  try{
+    const res = await apiClient.post<string>('/user/check-password', data)
+  return res.data // true 또는 false
+  } catch (error) {
+    return false
+  }
+}
+
+export async function updatePassword(password: string) {
+  try {
+    const response = await apiClient.patch('/user/password', password);
+    return response.data;
+  } catch (error) {
+    handleApiError(error, '비밀번호 변경 실패');
   }
 }

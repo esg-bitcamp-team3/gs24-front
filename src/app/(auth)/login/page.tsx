@@ -51,7 +51,7 @@ const LoginPage = () => {
       minH="100vh" // 화면 전체 높이
       justify="center" // 수평 중앙
       align="center" // 수직 중앙
-      bg="white" // 필요시 배경
+       bg="  linear-gradient(-225deg, #FFFEFF 0%, #D7FFFE 100%)"
     >
       <Card.Root
         boxAlign={'center'}
@@ -62,7 +62,7 @@ const LoginPage = () => {
         minH="50vh"
         maxW="lg"
         mx="auto"
-        bg="transparent"
+        bg="white"
         borderRadius="lg"
         boxShadow="lg"
         borderWidth="1px"
