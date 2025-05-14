@@ -8,9 +8,11 @@ import {
   Text,
   VStack,
   Badge,
+  Link,
   SimpleGrid
 } from '@chakra-ui/react'
 
+import React, {useEffect, useState} from 'react'
 import React, {useEffect, useState} from 'react'
 import {
   Chart as ChartJS,
@@ -38,7 +40,13 @@ import {EsgRatingResponse} from '@/lib/api/interfaces/esgRating'
 import {EsgLineData} from '@/components/chartDataImport'
 import {EsgBarData} from '../barChart'
 import {CompanyInfo} from '@/lib/api/interfaces/companyinfo'
-import {getCompanyInfo} from '@/lib/api/get'
+import {getCompanyInfo, getInterestOrganization} from '@/lib/api/get'
+import {postInteresrtOrganization} from '@/lib/api/post'
+import {deleteInterestOrganization} from '@/lib/api/delete'
+import {
+  OrganizationInfo,
+  OrganizationInfoResponse
+} from '@/lib/api/interfaces/interestOrganization'
 
 // 가짜 데이터
 const mockSummary = [
@@ -58,20 +66,51 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [endDate, setEndDate] = useState('')
 
   const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
+  const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
+  const [showMore, setShowMore] = useState(false)
+  const [ioCheck, setIoCheck] = useState<Boolean>(false)
 
 
   useEffect(() => {
-    const companyinfo = async () => {
+    const fetchData = async () => {
       try {
         const ciData = await getCompanyInfo(orgId)
         if (ciData) setCompanyInfo(ciData || null)
         else return null
+
+        const checkId = await getInterestOrganization()
+
+        if (
+          checkId?.organizationList.find((org: OrganizationInfo) => {
+            return org.organization.id === orgId
+          })
+        ) {
+          setIoCheck(true)
+        }
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
-    companyinfo()
+    fetchData()
   }, [])
+  const addButton = async () => {
+    try {
+      const data = await postInteresrtOrganization(orgId)
+      setIoCheck(true)
+      console.log('관심기업 등록 성공:', data)
+    } catch (error) {
+      console.error('관심기업 등록 실패:', error)
+    }
+  }
+  const deleteButton = async () => {
+    try {
+      const data = await deleteInterestOrganization(orgId)
+      setIoCheck(false)
+      console.log('관심기업 삭제 성공:', data)
+    } catch (error) {
+      console.error('관심기업 삭제 실패:', error)
+    }
+  }
   const handleDateRangeClick = (months: number) => {
     const now = new Date()
     const start = new Date()
@@ -100,23 +139,47 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
     )
   }
   const esgGrade = 'A'
-  // const companyQuery = 'NAVER'
+  function handleWordClick(event: any, word: any): void {
+    throw new Error('Function not implemented.')
+  }
+  const [keywordNews, setKeywordNews] = useState<{title: string; link: string}[]>([])
+  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null)
 
+  const handleNewsUpdate = (
+    newsList: {title: string; link: string}[],
+    keyword: string
+  ) => {
+    console.log('🔥 부모가 받은 뉴스:', newsList, keyword)
+    setKeywordNews(newsList)
+    setSelectedKeyword(keyword)
+  }
   return (
     <Flex flexDirection="column" gap={5}>
       {/* 기업 정보 및 차트 */}
       <Flex flexDirection="row" gap={4} width="full">
-        <Box p={3} borderRadius="lg" boxShadow="lg" w="md" backgroundColor="white">
+        <Box
+          p={3}
+          borderRadius="lg"
+          boxShadow="lg"
+          w="md"
+          backgroundColor="white"
+          position="relative">
           <VStack align="center" px="6" width="full" height="full">
             <Flex w="full" flexDirection="row" justify="space-between">
               <Text fontSize="lg" fontWeight="bold">
                 {companyinfo?.companyName}
               </Text>
+              <Button
+                color="black"
+                bg="white"
+                onClick={() => (ioCheck ? deleteButton() : addButton())}>
+                {ioCheck ? '관심기업 삭제하기' : '관심기업 추가하기'}
+              </Button>
             </Flex>
 
             <Separator variant="solid" size="lg" padding={1} w="full" />
             <DataList.Root orientation="horizontal">
-              {/* 기업 정보 */}
+              {/* 기업 정보 */}{' '}
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   업종
@@ -125,7 +188,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.industry}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   임직원수
@@ -134,7 +196,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.numberOfEmployees}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   기업 구분
@@ -143,7 +204,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.companyType}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   설립일
@@ -152,7 +212,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.establishmentDate}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   자본금
@@ -161,7 +220,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.capital}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   대표자
@@ -170,7 +228,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.ceoName}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   대졸 초임
@@ -179,7 +236,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.graduateSalary}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   주요 사업
@@ -188,7 +244,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.mainBusiness}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   4대 보험 가입 여부
@@ -197,7 +252,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                   {companyinfo?.hasFourInsurances}
                 </DataList.ItemValue>
               </DataList.Item>
-
               <DataList.Item>
                 <DataList.ItemLabel fontSize="small" fontWeight="bold">
                   홈페이지
@@ -208,37 +262,58 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                     target="_blank"
                     rel="noopener noreferrer">
                     {companyinfo?.homepage}
-                  </a>
+                  </a>{' '}
                 </DataList.ItemValue>
               </DataList.Item>
-
-              <DataList.Item>
-                <DataList.ItemLabel fontSize="small" fontWeight="bold">
-                  본사 주소
-                </DataList.ItemLabel>
-                <DataList.ItemValue fontSize="small">
-                  {companyinfo?.address}
-                </DataList.ItemValue>
-              </DataList.Item>
-
-              <DataList.Item>
-                <DataList.ItemLabel fontSize="small" fontWeight="bold">
-                  계열사 목록
-                </DataList.ItemLabel>
-                <DataList.ItemValue fontSize="small">
-                  {companyinfo?.affiliates?.join(', ')}
-                </DataList.ItemValue>
-              </DataList.Item>
-
-              <DataList.Item>
-                <DataList.ItemLabel fontSize="small" fontWeight="bold">
-                  매출액
-                </DataList.ItemLabel>
-                <DataList.ItemValue fontSize="small">
-                  {companyinfo?.revenue}
-                </DataList.ItemValue>
-              </DataList.Item>
+              <Button size="sm" variant="outline" onClick={() => setShowMore(!showMore)}>
+                {showMore ? '접기' : '더보기'}
+              </Button>
             </DataList.Root>
+
+            <Box mt={3} w="full">
+              {showMore && (
+                <Box
+                  position="absolute"
+                  top="95%" // 박스 아래쪽에 겹쳐서
+                  left={0}
+                  mt={-2}
+                  zIndex={10}
+                  background="white"
+                  borderRadius="md"
+                  boxShadow="xl"
+                  p={10}
+                  w="100%">
+                  <DataList.Root orientation="horizontal">
+                    <DataList.Item>
+                      <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                        본사 주소
+                      </DataList.ItemLabel>
+                      <DataList.ItemValue fontSize="small">
+                        {companyinfo?.address}
+                      </DataList.ItemValue>
+                    </DataList.Item>
+
+                    <DataList.Item>
+                      <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                        계열사 목록
+                      </DataList.ItemLabel>
+                      <DataList.ItemValue fontSize="small">
+                        {companyinfo?.affiliates?.join(', ')}
+                      </DataList.ItemValue>
+                    </DataList.Item>
+
+                    <DataList.Item>
+                      <DataList.ItemLabel fontSize="small" fontWeight="bold">
+                        매출액
+                      </DataList.ItemLabel>
+                      <DataList.ItemValue fontSize="small">
+                        {companyinfo?.revenue}
+                      </DataList.ItemValue>
+                    </DataList.Item>
+                  </DataList.Root>
+                </Box>
+              )}
+            </Box>
           </VStack>
         </Box>
 
@@ -248,7 +323,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
               ESG별 점수
             </Text>
             <Separator variant="solid" size="lg" padding={1} w="full" />
-            <SimpleGrid columns={3} >
+            <SimpleGrid columns={3}>
               {orgId && <EsgBarData organizationId={orgId} targetKey="E" />}
               {orgId && <EsgBarData organizationId={orgId} targetKey="S" />}
               {orgId && <EsgBarData organizationId={orgId} targetKey="G" />}
@@ -341,11 +416,13 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
               기업 관련 키워드
             </Text>
             <Box w="600px" h="300px" overflow="hidden">
-              <ESGWordCloud query={companyinfo?.companyName || ''} />
+              <ESGWordCloud
+                query={companyinfo?.companyName || ''}
+                onNewsUpdate={handleNewsUpdate}
+              />
             </Box>
           </VStack>
         </Box>
-
         <Box
           p={3}
           borderRadius="lg"
@@ -354,14 +431,19 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
           backgroundColor="white"
           h="auto">
           <Text fontSize="lg" fontWeight="bold">
-            키워드 관련 뉴스
+            키워드 관련 뉴스 {selectedKeyword && `: ${selectedKeyword}`}
           </Text>
           <Separator size="lg" w="full" />
           <VStack align="start" mt={2}>
             {keywordNews.map((news, idx) => (
-              <Text key={idx} fontSize="sm" color="gray.700">
-                • {news}
-              </Text>
+              <a
+                key={idx}
+                href={news.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{fontSize: '14px', color: 'black', textDecoration: 'underline'}}>
+                • {news.title}
+              </a>
             ))}
           </VStack>
         </Box>

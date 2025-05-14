@@ -37,6 +37,8 @@ const LoginPage = () => {
       toaster.success({
         title: '로그인 성공!'
       })
+      setTimeout(() => console.log('로그인 성공!'), 1000)
+
       router.push('/dashboard')
     } catch (error) {
       toaster.error({
