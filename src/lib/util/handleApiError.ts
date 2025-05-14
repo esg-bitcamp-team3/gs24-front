@@ -7,7 +7,7 @@ export function handleApiError(
   if (axios.isAxiosError(error)) {
     if (error.response?.data?.message) {
       console.error('API Error:', error.response.data.message)
-      throw new Error(error.response.data.message)
+      throw new ApiError(error.response.data.message)
     } else {
       console.error('Axios Error:', error.message)
       throw new Error(fallbackMessage)
@@ -15,5 +15,12 @@ export function handleApiError(
   } else {
     console.error('Unexpected Error:', error)
     throw new Error(fallbackMessage)
+  }
+}
+
+export class ApiError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ApiError'
   }
 }

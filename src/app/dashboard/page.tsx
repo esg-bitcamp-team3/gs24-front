@@ -26,6 +26,8 @@ import {
   OrganizationInfoResponse,
   OrganizationRank
 } from '@/lib/api/interfaces/interestOrganization'
+import {useRouter} from 'next/navigation'
+import {checkLogin} from '@/lib/api/auth'
 
 const items = [
   {id: 1, name: '제조업', category: '삼성전자', category1: 'SK하이닉스'},
@@ -133,6 +135,18 @@ const ExchangeRateBox = () => {
 }
 
 export default function Dashboard() {
+  const router = useRouter()
+
+  useEffect(() => {
+    const check = async () => {
+      const data = await checkLogin()
+      if (!data) {
+        router.push('/login')
+      }
+    }
+    check()
+  }, [])
+
   const [organizationList, setOrganizationList] = useState<OrganizationInfo[]>([])
   const [organizationRank, setOrganizationRank] = useState<OrganizationRank[]>([])
 
@@ -170,6 +184,19 @@ export default function Dashboard() {
   const [carbonitems1, setCarbonItems1] = useState<CarbonItem[]>([])
   const today = 20250508
   const yesterday = 20250507
+  // const formatDate = (date: Date): string => {
+  //   const year = date.getFullYear()
+  //   const month = String(date.getMonth() + 1).padStart(2, '0') // 월은 0부터 시작하므로 +1
+  //   const day = String(date.getDate()).padStart(2, '0')
+
+  //   return `${year}${month}${day}`
+  // }
+
+  // const today = new Date()
+  // const formatted = formatDate(today)
+  // const yesterdayDate = new Date(today)
+  // yesterdayDate.setDate(today.getDate() - 1)
+  // const yesterday = formatDate(yesterdayDate)
 
   useEffect(() => {
     const fetchCarbonData = async () => {

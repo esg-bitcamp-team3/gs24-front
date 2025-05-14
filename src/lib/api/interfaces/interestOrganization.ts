@@ -17,3 +17,10 @@ export interface OrganizationRank {
   esgGrade: string
   esgScore: number
 }
+
+export interface interestOrganization {
+  id: string
+  userId: string
+  organizationId: string
+  checkTime: string
+}

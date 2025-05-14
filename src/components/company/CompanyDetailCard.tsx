@@ -4,15 +4,17 @@ import {
   Box,
   DataList,
   Flex,
-  HStack,
-  Input,
   Separator,
   Text,
   VStack,
-  Button,
   Badge,
   Link,
+<<<<<<< HEAD
   Table
+=======
+  SimpleGrid,
+  Button
+>>>>>>> 7c3c8d636a750d265ea31b39bf69dbbfae322ab8
 } from '@chakra-ui/react'
 
 import React, {useEffect, useState} from 'react'
@@ -38,11 +40,19 @@ ChartJS.register(
 )
 
 import ESGWordCloud from '@/components/company/ESGWordCloud'
-import {Company} from '@/lib/api/interfaces/organizations'
 import {EsgRatingResponse} from '@/lib/api/interfaces/esgRating'
 import {EsgLineData} from '@/components/chartDataImport'
+import {EsgBarData} from '../barChart'
 import {CompanyInfo} from '@/lib/api/interfaces/companyinfo'
-import {getCompanyInfo} from '@/lib/api/get'
+import {getCompanyInfo, getInterestOrganization} from '@/lib/api/get'
+import {postInteresrtOrganization} from '@/lib/api/post'
+import {deleteInterestOrganization} from '@/lib/api/delete'
+import {
+  OrganizationInfo,
+  OrganizationInfoResponse
+} from '@/lib/api/interfaces/interestOrganization'
+import {FcLikePlaceholder} from 'react-icons/fc'
+import {FcLike} from 'react-icons/fc'
 
 // 가짜 데이터
 const mockSummary = [
@@ -51,59 +61,62 @@ const mockSummary = [
   '노사관계와 관련한 이슈가 있었으나 빠르게 개선된 것으로 보입니다.'
 ]
 
-// ESG 차트 데이터
-// const esgLineData = {
-//   labels: ['2021', '2022', '2023', '2024', '2025'],
-//   datasets: [
-//     {
-//       label: 'E (환경)',
-//       data: [60, 65, 70, 68, 74],
-//       borderColor: 'rgba(72, 187, 120, 1)',
-//       backgroundColor: 'rgba(72, 187, 120, 0.2)',
-//       fill: true,
-//       tension: 0.4
-//     },
-//     {
-//       label: 'S (사회)',
-//       data: [55, 60, 62, 65, 67],
-//       borderColor: 'rgba(66, 153, 225, 1)',
-//       backgroundColor: 'rgba(66, 153, 225, 0.2)',
-//       fill: true,
-//       tension: 0.4
-//     },
-//     {
-//       label: 'G (지배구조)',
-//       data: [70, 72, 74, 76, 79],
-//       borderColor: 'rgba(245, 101, 101, 1)',
-//       backgroundColor: 'rgba(245, 101, 101, 0.2)',
-//       fill: true,
-//       tension: 0.4
-//     }
-//   ]
-// }
+const keywordNews = [
+  '삼성전자, 2분기 실적 발표 앞두고 투자자 기대감 커져',
+  '친환경 반도체 공정 도입으로 ESG 평가 상승',
+  '국내외 ESG 펀드 삼성전자 비중 확대'
+]
 
 const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
 
-  const [fontSizes, setFontSizes] = useState<number[]>([])
   const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
-
   const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
   const [showMore, setShowMore] = useState(false)
+  const [ioCheck, setIoCheck] = useState<Boolean>(false)
+
 
   useEffect(() => {
-    const companyinfo = async () => {
+    const fetchData = async () => {
       try {
         const ciData = await getCompanyInfo(orgId)
         if (ciData) setCompanyInfo(ciData || null)
         else return null
+
+        const checkId = await getInterestOrganization()
+
+        if (
+          checkId?.organizationList.find((org: OrganizationInfo) => {
+            return org.organization.id === orgId
+          })
+        ) {
+          setIoCheck(true)
+        }
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
-    companyinfo()
+    fetchData()
   }, [])
+  const addButton = async () => {
+    try {
+      const data = await postInteresrtOrganization(orgId)
+      setIoCheck(true)
+      console.log('관심기업 등록 성공:', data)
+    } catch (error) {
+      console.error('관심기업 등록 실패:', error)
+    }
+  }
+  const deleteButton = async () => {
+    try {
+      const data = await deleteInterestOrganization(orgId)
+      setIoCheck(false)
+      console.log('관심기업 삭제 성공:', data)
+    } catch (error) {
+      console.error('관심기업 삭제 실패:', error)
+    }
+  }
   const handleDateRangeClick = (months: number) => {
     const now = new Date()
     const start = new Date()
@@ -165,6 +178,12 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
               <Text fontSize="lg" fontWeight="bold">
                 {companyinfo?.companyName}
               </Text>
+              <Button
+                color="black"
+                bg="white"
+                onClick={() => (ioCheck ? deleteButton() : addButton())}>
+                {ioCheck ? <FcLike /> : <FcLikePlaceholder />}
+              </Button>
             </Flex>
 
             <Separator variant="solid" size="lg" padding={1} w="full" />
@@ -312,6 +331,12 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
             <Text fontSize="lg" fontWeight="bold">
               ESG별 점수
             </Text>
+            <Separator variant="solid" size="lg" padding={1} w="full" />
+            <SimpleGrid columns={3}>
+              {orgId && <EsgBarData organizationId={orgId} targetKey="E" />}
+              {orgId && <EsgBarData organizationId={orgId} targetKey="S" />}
+              {orgId && <EsgBarData organizationId={orgId} targetKey="G" />}
+            </SimpleGrid>
             <Separator variant="solid" size="lg" w="full" />
           </Box>
 

@@ -1,5 +1,9 @@
+'use client'
 import NavBar from '@/components/navbar'
+import {checkLogin} from '@/lib/api/auth'
 import {Box, Flex} from '@chakra-ui/react'
+import {useRouter} from 'next/navigation'
+import {useEffect} from 'react'
 
 export default function Dashboard({children}: {children: React.ReactNode}) {
   return (

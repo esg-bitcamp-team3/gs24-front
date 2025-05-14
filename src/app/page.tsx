@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // pages/index.tsx
 'use client'
 import React from 'react'
@@ -96,10 +97,16 @@ function FullSection({children, id}: SectionProps) {
     </MotionBox>
   )
 }
+=======
+'use client'
+import Image from 'next/image'
+import styles from './page.module.css'
+>>>>>>> 7c3c8d636a750d265ea31b39bf69dbbfae322ab8
 
 export default function Home() {
   const isMobile = useBreakpointValue({base: true, md: false})
 
+<<<<<<< HEAD
   // 다음 섹션으로 스크롤
   const scrollToNext = () => {
     document.getElementById('section-1')?.scrollIntoView({behavior: 'smooth'})
@@ -310,5 +317,19 @@ export default function Home() {
         </Box>
       </FullSection>
     </Box>
+=======
+        <div className={styles.ctas}>
+          <a
+            className={styles.primary}
+            href="/login"
+            target="_blank"
+            rel="noopener noreferrer">
+            로그인
+          </a>
+        </div>
+      </main>
+      <footer className={styles.footer}></footer>
+    </div>
+>>>>>>> 7c3c8d636a750d265ea31b39bf69dbbfae322ab8
   )
 }
