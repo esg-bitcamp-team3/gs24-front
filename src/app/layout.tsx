@@ -2,6 +2,7 @@ import type {Metadata} from 'next'
 import './globals.css'
 import {Provider} from '@/components/ui/provider'
 import {Box, VStack} from '@chakra-ui/react'
+import {Toaster} from '@/components/ui/toaster'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -19,6 +20,7 @@ export default function RootLayout({
         <Provider>
           <Box width="100%" height="full" bg={'#f7f7f7'}>
             {children}
+            <Toaster />
           </Box>
         </Provider>
       </body>

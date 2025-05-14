@@ -4,9 +4,14 @@ import React, {useState} from 'react'
 import {useRouter} from 'next/navigation'
 
 import {toaster} from '@/components/ui/toaster'
-import {ApiError} from 'next/dist/server/api-utils'
+import {ApiError} from '@/lib/util/handleApiError'
 import {Box, Button, Flex, Input, Stack, Text, Card, Heading} from '@chakra-ui/react'
 import {signup} from '@/lib/api/auth'
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+function isValidEmail(email: string) {
+  return emailRegex.test(email)
+}
 
 const SignUpPage = () => {
   const [username, setUsername] = useState('')
@@ -32,6 +37,11 @@ const SignUpPage = () => {
 
     if (password !== confirmPassword) {
       setError('비밀번호가 일치하지 않습니다.')
+      return
+    }
+
+    if (isValidEmail(email) === false) {
+      setError('유효한 이메일 주소를 입력하세요.')
       return
     }
 
