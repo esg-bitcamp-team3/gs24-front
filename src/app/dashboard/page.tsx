@@ -1,7 +1,5 @@
 'use client'
 
-'use client'
-
 import {
   Box,
   chakra,
@@ -15,6 +13,7 @@ import {
 } from '@chakra-ui/react'
 import {BiCaretUp} from 'react-icons/bi'
 import axios from 'axios'
+import {LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer} from 'recharts'
 import {Table} from '@chakra-ui/react'
 import React, {useState, useEffect, use} from 'react'
 import {GoPlus} from 'react-icons/go'
@@ -60,6 +59,78 @@ const terms = [
     tags: []
   }
 ]
+
+const useExchangeRate = () => {
+  const [rate, setRate] = useState<number | null>(null)
+
+  useEffect(() => {
+    const apiKey = 'AGwwJzmJSGLew9fKMqtJ9pd2DcitjALm'
+    const fetchRate = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.exchangerate-api.com/v4/latest/USD?apikey=${apiKey}`
+        )
+        setRate(response.data.rates.KRW)
+      } catch (error) {
+        console.error('환율 데이터를 불러오는 데 실패했습니다.', error)
+      }
+    }
+
+    fetchRate()
+  }, [])
+
+  return rate
+}
+export const useExchangeData = () => {
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetch = async () => {
+      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+      const res = await axios.get(
+        'https://www.koreaexim.go.kr/site/program/financial/exchangeJSON',
+        {
+          params: {
+            authkey: process.env.NEXT_PUBLIC_EXCHANGE_RATE_API_KEY,
+            searchdate: today,
+            data: 'AP01'
+          }
+        }
+      )
+      setData(res.data)
+      setLoading(false)
+    }
+
+    fetch()
+  }, [])
+
+  return {data, loading}
+}
+// ==============================
+// 환율 박스 컴포넌트
+// ==============================
+const ExchangeRateBox = () => {
+  const rate = useExchangeRate()
+
+  return (
+    <Box p={5} borderRadius="lg" boxShadow="lg" w="md" h="300px" backgroundColor="white">
+      <Text fontSize="lg" fontWeight="bold" mb={3}>
+        시장지표
+      </Text>
+      <Separator variant="solid" size="lg" padding={1} w="full" />
+      <Box mt={4}>
+        {rate ? (
+          <Text fontSize="md">USD → KRW 환율: {rate.toFixed(2)}원</Text>
+        ) : (
+          <Text fontSize="sm" color="gray.500">
+            환율 정보를 불러오는 중...
+          </Text>
+        )}
+      </Box>
+    </Box>
+  )
+}
 
 export default function Dashboard() {
   const [organizationList, setOrganizationList] = useState<OrganizationInfo[]>([])
@@ -157,6 +228,7 @@ export default function Dashboard() {
 
     fetchCarbonData()
   }, [])
+
   return (
     <Flex
       flexDirection={{base: 'column', xl: 'row'}}
@@ -209,12 +281,13 @@ export default function Dashboard() {
             </Table.Body>
           </Table.Root>
         </Box>
+
         <Flex flexDirection="column" gap={4} width="full">
           <Box
             p={5}
             borderRadius="lg"
             boxShadow="lg"
-            w="10xl"
+            w="7xl"
             h="300px"
             backgroundColor="white">
             <Flex justifyContent="space-between">
@@ -264,9 +337,10 @@ export default function Dashboard() {
               </Table.Body>
             </Table.Root>
           </Box>
+
           {/* ESG 섹션 */}
-          <Flex flexDirection="row" gap={4} width="full"></Flex>
         </Flex>
+        <ExchangeRateBox />
       </Flex>
 
       {/* 키워드 및 뉴스 영역 */}
