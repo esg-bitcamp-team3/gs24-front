@@ -9,10 +9,10 @@ import {
   VStack,
   Badge,
   Link,
-  SimpleGrid
+  SimpleGrid,
+  Button
 } from '@chakra-ui/react'
 
-import React, {useEffect, useState} from 'react'
 import React, {useEffect, useState} from 'react'
 import {
   Chart as ChartJS,
