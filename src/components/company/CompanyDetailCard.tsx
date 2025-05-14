@@ -4,15 +4,13 @@ import {
   Box,
   DataList,
   Flex,
-  HStack,
-  Input,
   Separator,
   Text,
   VStack,
-  Button,
   Badge,
   Link,
-  SimpleGrid
+  SimpleGrid,
+  Button
 } from '@chakra-ui/react'
 
 import React, {useEffect, useState} from 'react'
@@ -38,7 +36,6 @@ ChartJS.register(
 )
 
 import ESGWordCloud from '@/components/company/ESGWordCloud'
-import {Company} from '@/lib/api/interfaces/organizations'
 import {EsgRatingResponse} from '@/lib/api/interfaces/esgRating'
 import {EsgLineData} from '@/components/chartDataImport'
 import {EsgBarData} from '../barChart'
@@ -68,11 +65,11 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
 
-  const [fontSizes, setFontSizes] = useState<number[]>([])
   const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
   const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
   const [showMore, setShowMore] = useState(false)
   const [ioCheck, setIoCheck] = useState<Boolean>(false)
+
 
   useEffect(() => {
     const fetchData = async () => {

@@ -69,145 +69,130 @@ const SignUpPage = () => {
         minH="50vh"
         maxW="lg"
         mx="auto"
+        paddingLeft={4}
+        paddingRight={4}
         bg="transparent"
         borderRadius="lg"
         boxShadow="lg"
         borderWidth="1px"
         borderColor="white">
-        <Flex
-          justify="center"
-          align="center"
-          // 전체 화면 높이
-          bg="whiteAlpha.1"
-          borderRadius="lg"
-          boxShadow="2xl"
-          width="100%"
-          height="100%"
-          padding={8}
-          borderColor="white"
-          backdropFilter="blur(10px)">
-          <Box
-            width={{base: '100%', md: '400px'}}
-            bg="transparent"
-            p={8}
-            borderRadius="md">
-            <Heading as="h2" size="lg" color="black" textAlign="center" mb={8}>
-              Sign Up
-            </Heading>
-            <Stack gap={6}>
-              <Box>
-                <Text color="black" mb={1} fontWeight="medium">
-                  Username
-                </Text>
+        <Box width={{base: '100%', md: '400px'}} bg="transparent" p={8} borderRadius="md">
+          <Heading as="h2" size="3xl" color="black" textAlign="center" mb={6}>
+            Sign Up
+          </Heading>
+          <Stack gap={4}>
+            <Box>
+              <Text color="black" mb={1} fontWeight="medium">
+                Username
+              </Text>
 
-                <Input
-                  variant="flushed"
-                  placeholder=""
-                  type="text"
-                  value={username}
-                  onChange={e => setUsername(e.target.value)}
-                  color="black"
-                  _placeholder={{color: 'gray.300'}}
-                  borderColor="black"
-                />
-              </Box>
-              <Box>
-                <Text color="black" mb={1} fontWeight="medium">
-                  ID
-                </Text>
-                <Input
-                  variant="flushed"
-                  placeholder=""
-                  value={id}
-                  onChange={e => setId(e.target.value)}
-                  color="black"
-                  _placeholder={{color: 'gray.300'}}
-                  borderColor="black"
-                />
-              </Box>
+              <Input
+                variant="flushed"
+                placeholder=""
+                type="text"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                color="black"
+                _placeholder={{color: 'gray.300'}}
+                borderColor="black"
+              />
+            </Box>
+            <Box>
+              <Text color="black" mb={1} fontWeight="medium">
+                ID
+              </Text>
+              <Input
+                variant="flushed"
+                placeholder=""
+                value={id}
+                onChange={e => setId(e.target.value)}
+                color="black"
+                _placeholder={{color: 'gray.300'}}
+                borderColor="black"
+              />
+            </Box>
 
-              <Box>
-                <Text color="black" mb={1} fontWeight="medium">
-                  Password
-                </Text>
+            <Box>
+              <Text color="black" mb={1} fontWeight="medium">
+                Password
+              </Text>
 
-                <Input
-                  variant="flushed"
-                  placeholder=""
-                  type="password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  color="black"
-                  _placeholder={{color: 'gray.300'}}
-                  borderColor="black"
-                />
-              </Box>
-              <Box>
-                <Text color="black" mb={1} fontWeight="medium">
-                  Confirm-Password
-                </Text>
+              <Input
+                variant="flushed"
+                placeholder=""
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                color="black"
+                _placeholder={{color: 'gray.300'}}
+                borderColor="black"
+              />
+            </Box>
+            <Box>
+              <Text color="black" mb={1} fontWeight="medium">
+                Confirm-Password
+              </Text>
 
-                <Input
-                  variant="flushed"
-                  placeholder=""
-                  type="password"
-                  value={confirmPassword}
-                  onChange={e => setConfirmPassword(e.target.value)}
-                  color="black"
-                  _placeholder={{color: 'gray.300'}}
-                  borderColor="black"
-                />
-              </Box>
-              <Box>
-                <Text color="black" mb={1} fontWeight="medium">
-                  Email
-                </Text>
-                <Input
-                  variant="flushed"
-                  placeholder=""
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  color="black"
-                  _placeholder={{color: 'gray.300'}}
-                  borderColor="black"
-                />
-              </Box>
-              <Box>
-                <Text color="black" mb={1} fontWeight="medium">
-                  Phone number
-                </Text>
+              <Input
+                variant="flushed"
+                placeholder=""
+                type="password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                color="black"
+                _placeholder={{color: 'gray.300'}}
+                borderColor="black"
+              />
+            </Box>
+            <Box>
+              <Text color="black" mb={1} fontWeight="medium">
+                Email
+              </Text>
+              <Input
+                variant="flushed"
+                placeholder=""
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                color="black"
+                _placeholder={{color: 'gray.300'}}
+                borderColor="black"
+              />
+            </Box>
+            <Box>
+              <Text color="black" mb={1} fontWeight="medium">
+                Phone number
+              </Text>
 
-                <Input
-                  variant="flushed"
-                  placeholder=""
-                  type="text"
-                  value={phonenumber}
-                  onChange={e => setPhonenumber(e.target.value)}
-                  color="black"
-                  _placeholder={{color: 'gray.300'}}
-                  borderColor="black"
-                />
-              </Box>
+              <Input
+                variant="flushed"
+                placeholder=""
+                type="text"
+                value={phonenumber}
+                onChange={e => setPhonenumber(e.target.value)}
+                color="black"
+                _placeholder={{color: 'gray.300'}}
+                borderColor="black"
+              />
+            </Box>
 
-              {error && (
-                <Text color="red.400" fontSize="sm">
-                  {error}
-                </Text>
-              )}
+            {error && (
+              <Text color="red.400" fontSize="sm">
+                {error}
+              </Text>
+            )}
 
-              <Button
-                bg="black"
-                color="white"
-                _hover={{bg: 'gray.500'}}
-                size="lg"
-                fontWeight="bold"
-                onClick={handleSubmit}>
-                Create Account
-              </Button>
-              <Flex justify="center"></Flex>
-            </Stack>
-          </Box>
-        </Flex>
+            <Button
+              bg="black"
+              color="white"
+              _hover={{bg: 'gray.500'}}
+              size="lg"
+              fontWeight="bold"
+              onClick={handleSubmit}>
+              Create Account
+            </Button>
+            <Flex justify="center"></Flex>
+          </Stack>
+        </Box>
       </Card.Root>
     </Flex>
   )
