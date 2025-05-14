@@ -3,6 +3,7 @@ import apiClient from './apiclient'
 import {CompanyInfo} from './interfaces/companyinfo'
 
 import {EsgRatingResponse} from './interfaces/esgRating'
+import {EsgTerm} from './interfaces/esgTerms'
 import {
   OrganizationInfoResponse,
   OrganizationRank
@@ -63,6 +64,15 @@ export async function getOrganizationRank() {
 export async function getCompanyInfo(id: string) {
   try {
     const response = await apiClient.get<CompanyInfo>(`/company/${id}`)
+    return response.data
+  } catch (error) {
+    handleApiError(error, '기업 정보를 가져오는 데 실패했습니다.')
+  }
+}
+
+export async function getEsgTerms() {
+  try {
+    const response = await apiClient.get<EsgTerm[]>(`/terms`)
     return response.data
   } catch (error) {
     handleApiError(error, '기업 정보를 가져오는 데 실패했습니다.')

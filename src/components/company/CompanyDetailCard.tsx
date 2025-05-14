@@ -50,6 +50,8 @@ import {
   OrganizationInfo,
   OrganizationInfoResponse
 } from '@/lib/api/interfaces/interestOrganization'
+import {FcLikePlaceholder} from 'react-icons/fc'
+import {FcLike} from 'react-icons/fc'
 
 // 가짜 데이터
 const mockSummary = [
@@ -176,7 +178,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                 color="black"
                 bg="white"
                 onClick={() => (ioCheck ? deleteButton() : addButton())}>
-                {ioCheck ? '관심기업 삭제하기' : '관심기업 추가하기'}
+                {ioCheck ? <FcLike /> : <FcLikePlaceholder />}
               </Button>
             </Flex>
 

@@ -12,17 +12,6 @@ export async function middleware(request: NextRequest) {
   }
 
   return NextResponse.next()
-
-  // const url = request.nextUrl.clone()
-
-  // const isLoggedIn = await checkLogin()
-
-  // if (!isLoggedIn) {
-  //   url.pathname = '/login'
-  //   return NextResponse.redirect(url)
-  // }
-
-  // return NextResponse.next()
 }
 
 export const config = {

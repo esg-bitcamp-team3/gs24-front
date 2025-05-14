@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react'
 import {login} from '@/lib/api/auth'
 import {toaster} from '@/components/ui/toaster'
-import {ApiError} from 'next/dist/server/api-utils'
+import {ApiError} from '@/lib/util/handleApiError'
 
 const LoginPage = () => {
   const [username, setUsername] = useState('')
@@ -37,7 +37,7 @@ const LoginPage = () => {
       toaster.success({
         title: '로그인 성공!'
       })
-      setTimeout(() => console.log('로그인 성공!'), 1000)
+      // setTimeout(() => console.log('로그인 성공!'), 1000)
 
       router.push('/dashboard')
     } catch (error) {
