@@ -15,7 +15,7 @@ import {
   SimpleGrid,
   ButtonGroup
 } from '@chakra-ui/react'
-import {Dialog} from '@chakra-ui/react'
+
 import React, {useEffect, useState} from 'react'
 import {
   Chart as ChartJS,
@@ -27,6 +27,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js'
+import RealTimeChart from '@/components/company/RealTimeChart'
 
 ChartJS.register(
   CategoryScale,
@@ -54,7 +55,7 @@ import {
 import {FcLikePlaceholder} from 'react-icons/fc'
 import {FcLike} from 'react-icons/fc'
 import InterestButton from '../etcs/InterestButton'
-
+import {CloseButton, Portal} from '@chakra-ui/react'
 // 가짜 데이터
 const mockSummary = [
   '삼성전자는 ESG 측면에서 지속 가능한 경영활동을 강화하고 있으며...',
@@ -168,6 +169,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
               <Text fontSize="lg" fontWeight="bold">
                 {companyinfo?.companyName}{' '}
               </Text>
+
               <InterestButton {...btnState} />
             </Flex>
 
@@ -342,7 +344,11 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
                 주식가격
               </Text>
               <Separator size="lg" w="full" />
-              <VStack align="start" mt={2}></VStack>
+              <VStack align="start" mt={2}>
+                <main className="p-10">
+                  <RealTimeChart />
+                </main>
+              </VStack>
             </Box>
           </Flex>
         </Flex>
@@ -397,20 +403,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
           </VStack>
         </Box>
       </Flex>
-      <Dialog.Root>
-        <Dialog.Trigger />
-        <Dialog.Backdrop />
-        <Dialog.Positioner>
-          <Dialog.Content>
-            <Dialog.CloseTrigger />
-            <Dialog.Header>
-              <Dialog.Title />
-            </Dialog.Header>
-            <Dialog.Body />
-            <Dialog.Footer />
-          </Dialog.Content>
-        </Dialog.Positioner>
-      </Dialog.Root>
     </Flex>
   )
 }
