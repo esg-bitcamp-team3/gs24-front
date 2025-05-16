@@ -1,6 +1,6 @@
 import {handleApiError} from '../util/handleApiError'
 import apiClient from './apiclient'
-import {CompanyInfo} from './interfaces/companyinfo'
+import {CompanyInfo, InterestCompanyInfo} from './interfaces/companyinfo'
 
 import {EsgRatingResponse} from './interfaces/esgRating'
 import {EsgTerm} from './interfaces/esgTerms'
@@ -8,10 +8,24 @@ import {
   OrganizationInfoResponse,
   OrganizationRank
 } from './interfaces/interestOrganization'
+import {OrganizationWithInterestPage} from './interfaces/organizations'
 
 export const getOrganizations = async () => {
   try {
     const res = await apiClient.get('/organizations')
+    return res.data
+  } catch (err) {
+    console.error('❌ 회사 목록 가져오기 실패:', err)
+    throw err
+  }
+}
+
+export const getOrganizationsWithInterest = async (page: number) => {
+  try {
+    const res = await apiClient.get<OrganizationWithInterestPage>(
+      '/interestOrganization/organizations',
+      {params: {page}}
+    )
     return res.data
   } catch (err) {
     console.error('❌ 회사 목록 가져오기 실패:', err)
@@ -46,6 +60,18 @@ export async function getInterestOrganization() {
     const response = await apiClient.get<OrganizationInfoResponse>(
       '/interestOrganization'
     )
+    return response.data
+  } catch (error) {
+    handleApiError(error, '관심기업 정보를 가져오는 데 실패했습니다.')
+  }
+}
+
+export async function getInterestCompanyInfo() {
+  try {
+    const response = await apiClient.get<InterestCompanyInfo[]>(
+      '/interestOrganization/interest'
+    )
+    console.log('response', response.data)
     return response.data
   } catch (error) {
     handleApiError(error, '관심기업 정보를 가져오는 데 실패했습니다.')

@@ -8,26 +8,28 @@ import {
   HStack,
   Input,
   Separator,
+  Spinner,
   Text,
   VStack
 } from '@chakra-ui/react'
 import {BiCaretUp} from 'react-icons/bi'
+
 import axios from 'axios'
-import {LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer} from 'recharts'
 import {Table} from '@chakra-ui/react'
 import React, {useState, useEffect, use} from 'react'
 import {GoPlus} from 'react-icons/go'
 import {Button} from '@chakra-ui/react'
 import Link from 'next/link'
-import {get} from 'http'
-import {getInterestOrganization, getOrganizationRank} from '@/lib/api/get'
+import {getInterestCompanyInfo, getOrganizationRank} from '@/lib/api/get'
 import {
   OrganizationInfo,
-  OrganizationInfoResponse,
   OrganizationRank
 } from '@/lib/api/interfaces/interestOrganization'
 import {useRouter} from 'next/navigation'
 import {checkLogin} from '@/lib/api/auth'
+import SearchOrg from '@/components/navbar/SearchOrg'
+import {CompanyInfo, InterestCompanyInfo} from '@/lib/api/interfaces/companyinfo'
+import {Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts'
 
 const items = [
   {id: 1, name: '제조업', category: '삼성전자', category1: 'SK하이닉스'},
@@ -35,20 +37,6 @@ const items = [
   {id: 3, name: '소비재', category: 'LG 생활건강', category1: 'CJ제일제당'},
   {id: 4, name: 'IT서비스', category: '삼성SDS', category1: '네이버'},
   {id: 5, name: '유통물류', category: '신세계', category1: '이마트'}
-]
-const likeitems = [
-  {id: 1, name: 'SK하이닉스', category: '제조업', sales1: '150,000,000'},
-  {id: 2, name: 'KB국민은행', category: 'NH 은행', sales1: '123,185,123'},
-  {id: 3, name: 'CJ제일제당', category: '소비재', sales1: '123,123,123'},
-  {id: 4, name: '네이버', category: 'IT서비스', sales1: '159,159,159'},
-  {id: 5, name: '이마트', category: '유통물류', sales1: ',154,189,333'}
-]
-const rankitems = [
-  {id: 1, name: '1', category: 'SK하이닉스', rank1: 'A+', score1: '85'},
-  {id: 2, name: '2', category: 'KB국민은행', rank1: 'A', score1: '85'},
-  {id: 3, name: '3', category: 'CJ제일제당', rank1: 'A', score1: '85'},
-  {id: 4, name: '4', category: '네이버', rank1: 'B+', score1: '85'},
-  {id: 5, name: '5', category: '이마트', rank1: 'B+', score1: '85'}
 ]
 
 // 탄소 배출권 데이터 상태 추가
@@ -61,75 +49,77 @@ const terms = [
     tags: []
   }
 ]
-
-const useExchangeRate = () => {
-  const [rate, setRate] = useState<number | null>(null)
-
-  useEffect(() => {
-    const apiKey = 'AGwwJzmJSGLew9fKMqtJ9pd2DcitjALm'
-    const fetchRate = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.exchangerate-api.com/v4/latest/USD?apikey=${apiKey}`
-        )
-        setRate(response.data.rates.KRW)
-      } catch (error) {
-        console.error('환율 데이터를 불러오는 데 실패했습니다.', error)
-      }
-    }
-
-    fetchRate()
-  }, [])
-
-  return rate
+interface ExchangeRateItem {
+  date: string
+  rate: number
 }
-export const useExchangeData = () => {
-  const [data, setData] = useState([])
+
+export const useExchangeRateHistory = () => {
+  const [data, setData] = useState<ExchangeRateItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<null | string>(null)
 
   useEffect(() => {
     const fetch = async () => {
-      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
-      const res = await axios.get(
-        'https://www.koreaexim.go.kr/site/program/financial/exchangeJSON',
-        {
-          params: {
-            authkey: process.env.NEXT_PUBLIC_EXCHANGE_RATE_API_KEY,
-            searchdate: today,
-            data: 'AP01'
-          }
-        }
-      )
-      setData(res.data)
-      setLoading(false)
+      try {
+        const res = await axios.get(
+          `http://localhost:8000/api/market-price/exchange-rate`
+        )
+        const rawData = res.data
+
+        const parsed = rawData
+          .map((entry: any) => {
+            const usd = entry.data.find((d: any) => d.cur_unit === 'USD')
+            if (!usd || !usd.deal_bas_r) return null
+
+            return {
+              date: entry.date,
+              rate: parseFloat(usd.deal_bas_r.replace(',', ''))
+            }
+          })
+          .filter(Boolean) // null 제거
+
+        setData(parsed.reverse()) // 최신 → 오래된 순서로 정렬
+      } catch (err: any) {
+        console.error('환율 불러오기 실패:', err)
+        setError('환율 데이터를 불러오는 중 오류가 발생했습니다.')
+      } finally {
+        setLoading(false)
+      }
     }
 
     fetch()
   }, [])
 
-  return {data, loading}
+  return {data, loading, error}
 }
+
 // ==============================
 // 환율 박스 컴포넌트
 // ==============================
-const ExchangeRateBox = () => {
-  const rate = useExchangeRate()
+const ExchangeRateChart = () => {
+  const {data, loading, error} = useExchangeRateHistory()
 
   return (
-    <Box p={5} borderRadius="lg" boxShadow="lg" w="md" h="300px" backgroundColor="white">
+    <Box p={4} bg="white" borderRadius="lg" shadow="md" w="full" h="300px">
       <Text fontSize="lg" fontWeight="bold" mb={3}>
-        시장지표
+        최근 5일 USD → KRW 환율
       </Text>
-      <Separator variant="solid" size="lg" padding={1} w="full" />
-      <Box mt={4}>
-        {rate ? (
-          <Text fontSize="md">USD → KRW 환율: {rate.toFixed(2)}원</Text>
-        ) : (
-          <Text fontSize="sm" color="gray.500">
-            환율 정보를 불러오는 중...
-          </Text>
-        )}
-      </Box>
+
+      {loading ? (
+        <Spinner />
+      ) : error ? (
+        <Text color="red.500">{error}</Text>
+      ) : (
+        <ResponsiveContainer width="100%" height="80%">
+          <LineChart data={data}>
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Line type="monotone" dataKey="rate" stroke="#3182ce" strokeWidth={2} />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </Box>
   )
 }
@@ -147,17 +137,21 @@ export default function Dashboard() {
     check()
   }, [])
 
-  const [organizationList, setOrganizationList] = useState<OrganizationInfo[]>([])
+  // const [organizationList, setOrganizationList] = useState<OrganizationInfo[]>([])
   const [organizationRank, setOrganizationRank] = useState<OrganizationRank[]>([])
+  const [companyinfo, setCompanyInfo] = useState<InterestCompanyInfo[]>()
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const ioData = await getInterestOrganization()
+        // const ioData = await getInterestOrganization()
         const orData = await getOrganizationRank()
+        const companyInfoData = await getInterestCompanyInfo()
 
-        if (ioData) setOrganizationList(ioData?.organizationList || [])
-        else return null
+        setCompanyInfo(companyInfoData || [])
+
+        // if (ioData) setOrganizationList(ioData?.organizationList || [])
+        // else return null
 
         if (orData) setOrganizationRank(orData || [])
         else return null
@@ -270,7 +264,7 @@ export default function Dashboard() {
           p={5}
           borderRadius="lg"
           boxShadow="lg"
-          w="md"
+          w="5xl"
           h="300px"
           backgroundColor="white">
           <Text fontSize="lg" fontWeight="bold" alignSelf="flex-start" mb={3}>
@@ -314,7 +308,7 @@ export default function Dashboard() {
             p={5}
             borderRadius="lg"
             boxShadow="lg"
-            w="7xl"
+            w="5xl"
             h="300px"
             backgroundColor="white">
             <Flex justifyContent="space-between">
@@ -322,18 +316,22 @@ export default function Dashboard() {
                 관심 기업 리스트
               </Text>
 
-              <Button variant="ghost">
-                {' '}
-                <GoPlus />
-                기업추가
-              </Button>
+              <Box>
+                <SearchOrg
+                  label={
+                    <>
+                      <GoPlus />
+                      기업추가
+                    </>
+                  }
+                />
+              </Box>
             </Flex>
             <Separator variant="solid" size="lg" padding={1} w="full" />
             <Table.Root size="sm">
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeader p={2} fontWeight="bold" textAlign="center">
-                    {' '}
                     기업명
                   </Table.ColumnHeader>
                   <Table.ColumnHeader p={2} fontWeight="bold" textAlign="center">
@@ -345,19 +343,21 @@ export default function Dashboard() {
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                {organizationList &&
-                  organizationList.map(likeitems => (
-                    <Table.Row key={likeitems.organization.id}>
+                {companyinfo &&
+                  companyinfo.map((likeitems, index) => (
+                    <Table.Row key={index}>
                       <Table.Cell p={2} textAlign="center">
-                        {likeitems.organization.companyName}
+                        <Link
+                          href={`/dashboard/companyInfo/${likeitems.interestOrganization.organizationId}`}>
+                          {likeitems.companyInfo.companyName}
+                        </Link>
+                      </Table.Cell>
+
+                      <Table.Cell p={2} textAlign="center">
+                        {likeitems.companyInfo.industry}
                       </Table.Cell>
                       <Table.Cell p={2} textAlign="center">
-                        {/* {likeitems.organization.industry} */}
-                        {0}
-                      </Table.Cell>
-                      <Table.Cell p={2} textAlign="center">
-                        {/* {likeitems.organization.capital} */}
-                        {0}
+                        {likeitems.companyInfo.capital}
                       </Table.Cell>
                     </Table.Row>
                   ))}
@@ -367,7 +367,7 @@ export default function Dashboard() {
 
           {/* ESG 섹션 */}
         </Flex>
-        <ExchangeRateBox />
+        <ExchangeRateChart />
       </Flex>
 
       {/* 키워드 및 뉴스 영역 */}
