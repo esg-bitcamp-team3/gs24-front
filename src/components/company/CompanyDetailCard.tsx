@@ -8,12 +8,9 @@ import {
   Text,
   VStack,
   Badge,
-  Link,
-  Table,
   useDisclosure,
   Button,
-  SimpleGrid,
-  ButtonGroup
+  SimpleGrid
 } from '@chakra-ui/react'
 import {Dialog} from '@chakra-ui/react'
 import React, {useEffect, useState} from 'react'
@@ -44,16 +41,14 @@ import {EsgLineData} from '@/components/chartDataImport'
 import {EsgBarData} from '../barChart'
 import {CompanyInfo} from '@/lib/api/interfaces/companyinfo'
 import {getCompanyInfo, getInterestOrganization} from '@/lib/api/get'
-import {postInteresrtOrganization} from '@/lib/api/post'
-import {deleteInterestOrganization} from '@/lib/api/delete'
 import {
   InterestButtonProps,
-  OrganizationInfo,
-  OrganizationInfoResponse
+  OrganizationInfo
 } from '@/lib/api/interfaces/interestOrganization'
-import {FcLikePlaceholder} from 'react-icons/fc'
-import {FcLike} from 'react-icons/fc'
+
 import InterestButton from '../etcs/InterestButton'
+import EmotionCard from './emotion'
+import OpenDart from './openDart'
 
 // 가짜 데이터
 const mockSummary = [
@@ -72,7 +67,6 @@ const CompanyInfoDetailCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
-  const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
   const [showMore, setShowMore] = useState(false)
   // const [ioCheck, setIoCheck] = useState<Boolean>(false)
 
@@ -154,6 +148,8 @@ const CompanyInfoDetailCard = ({orgId}: {orgId: string}) => {
   }
   return (
     <Flex flexDirection="column" gap={5}>
+      {companyinfo && <EmotionCard orgname={companyinfo?.companyName} />}
+
       {/* 기업 정보 및 차트 */}
       <Flex flexDirection="row" gap={4} width="full">
         <Box
@@ -168,6 +164,7 @@ const CompanyInfoDetailCard = ({orgId}: {orgId: string}) => {
               <Text fontSize="lg" fontWeight="bold">
                 {companyinfo?.companyName}{' '}
               </Text>
+              <OpenDart orgCode="" />
               <InterestButton {...btnState} />
             </Flex>
 
