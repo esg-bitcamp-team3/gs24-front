@@ -1,26 +1,12 @@
 // src/components/Navbar.tsx
 'use client'
 
-import {
-  Avatar,
-  Box,
-  Button,
-  Flex,
-  IconButton,
-  Input,
-  Image,
-  Dialog,
-  Portal,
-  Text
-} from '@chakra-ui/react'
+import {Avatar, Box, Button, Flex, IconButton, Image} from '@chakra-ui/react'
 import {useRouter} from 'next/navigation'
 import React from 'react'
 import {LuLogOut, LuSearch} from 'react-icons/lu'
-import {useEffect, useState} from 'react'
-import {Company} from '../lib/api/interfaces/organizations'
-import {getOrganizations} from '@/lib/api/get'
-import {log} from 'console'
 import {logout} from '@/lib/api/auth'
+import SearchOrg from './navbar/SearchOrg'
 
 // 백엔드에서 받아온 회사 리스트의 타입을 정의
 
@@ -97,65 +83,14 @@ const Navbar: React.FC = () => {
           비교하기
         </Button>
         {/* 검색하기 버튼================================================================== */}
-        <Dialog.Root
-          open={isOpen}
-          onOpenChange={details => setIsOpen(details.open)}
-          scrollBehavior={'inside'}
-          placement="center">
-          <Dialog.Trigger asChild>
-            <Button variant="outline" size="sm" padding={3}>
+        <SearchOrg
+          label={
+            <>
               <LuSearch />
               Search
-            </Button>
-          </Dialog.Trigger>
-
-          <Portal>
-            <Dialog.Backdrop />
-            <Dialog.Positioner>
-              <Dialog.Content padding={4}>
-                <Dialog.Header>
-                  <Input
-                    paddingLeft={3}
-                    marginBottom={3}
-                    placeholder="search"
-                    value={searchTerm}
-                    onChange={e => setSearchTerm((e.target as HTMLInputElement).value)}
-                  />
-                </Dialog.Header>
-
-                <Dialog.Body pt="4">
-                  <Box height={300}>
-                    {filteredCompanies.length === 0 ? (
-                      <Text color="gray.500" textAlign="center">
-                        No companies found.
-                      </Text>
-                    ) : (
-                      filteredCompanies.map(company => (
-                        <Button
-                          key={company.id}
-                          paddingLeft={3}
-                          variant="ghost"
-                          color="black"
-                          justifyContent="flex-start"
-                          onClick={() => handleCompanyClick(company.id)}
-                          w={'100%'}>
-                          {company.companyName}
-                        </Button>
-                      ))
-                    )}
-                  </Box>
-                </Dialog.Body>
-                <Dialog.Footer>
-                  <Dialog.ActionTrigger asChild>
-                    <Button variant="outline" marginTop={3} padding={3}>
-                      Close
-                    </Button>
-                  </Dialog.ActionTrigger>
-                </Dialog.Footer>
-              </Dialog.Content>
-            </Dialog.Positioner>
-          </Portal>
-        </Dialog.Root>
+            </>
+          }
+        />
         {/* 아바타================================================================== */}
         <div onClick={() => router.push('/dashboard/myPage')} style={{cursor: 'pointer'}}>
           <Avatar.Root shape="full" size="lg">

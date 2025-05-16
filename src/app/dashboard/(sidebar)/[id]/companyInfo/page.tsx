@@ -9,7 +9,7 @@ interface Props {
 
 const CompanyInfo = ({params}: Props) => {
   const {id} = use(params)
-  
+
   return <CompanyInfoCard orgId={id} />
 }
 

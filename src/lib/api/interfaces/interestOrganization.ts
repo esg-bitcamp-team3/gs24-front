@@ -24,3 +24,8 @@ export interface interestOrganization {
   organizationId: string
   checkTime: string
 }
+
+export interface InterestButtonProps {
+  orgId: string
+  interest: Boolean
+}
