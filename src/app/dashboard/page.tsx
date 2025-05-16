@@ -1,33 +1,20 @@
 'use client'
-
-import {
-  Box,
-  chakra,
-  DataList,
-  Flex,
-  HStack,
-  Input,
-  Separator,
-  Text,
-  VStack
-} from '@chakra-ui/react'
-import {BiCaretUp} from 'react-icons/bi'
+import {Box, Flex, Separator, Text} from '@chakra-ui/react'
 import axios from 'axios'
-import {LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer} from 'recharts'
 import {Table} from '@chakra-ui/react'
 import React, {useState, useEffect, use} from 'react'
 import {GoPlus} from 'react-icons/go'
 import {Button} from '@chakra-ui/react'
 import Link from 'next/link'
-import {get} from 'http'
-import {getInterestOrganization, getOrganizationRank} from '@/lib/api/get'
+import {getInterestCompanyInfo, getOrganizationRank} from '@/lib/api/get'
 import {
   OrganizationInfo,
-  OrganizationInfoResponse,
   OrganizationRank
 } from '@/lib/api/interfaces/interestOrganization'
 import {useRouter} from 'next/navigation'
 import {checkLogin} from '@/lib/api/auth'
+import SearchOrg from '@/components/navbar/SearchOrg'
+import {CompanyInfo, InterestCompanyInfo} from '@/lib/api/interfaces/companyinfo'
 
 const items = [
   {id: 1, name: '제조업', category: '삼성전자', category1: 'SK하이닉스'},
@@ -35,20 +22,6 @@ const items = [
   {id: 3, name: '소비재', category: 'LG 생활건강', category1: 'CJ제일제당'},
   {id: 4, name: 'IT서비스', category: '삼성SDS', category1: '네이버'},
   {id: 5, name: '유통물류', category: '신세계', category1: '이마트'}
-]
-const likeitems = [
-  {id: 1, name: 'SK하이닉스', category: '제조업', sales1: '150,000,000'},
-  {id: 2, name: 'KB국민은행', category: 'NH 은행', sales1: '123,185,123'},
-  {id: 3, name: 'CJ제일제당', category: '소비재', sales1: '123,123,123'},
-  {id: 4, name: '네이버', category: 'IT서비스', sales1: '159,159,159'},
-  {id: 5, name: '이마트', category: '유통물류', sales1: ',154,189,333'}
-]
-const rankitems = [
-  {id: 1, name: '1', category: 'SK하이닉스', rank1: 'A+', score1: '85'},
-  {id: 2, name: '2', category: 'KB국민은행', rank1: 'A', score1: '85'},
-  {id: 3, name: '3', category: 'CJ제일제당', rank1: 'A', score1: '85'},
-  {id: 4, name: '4', category: '네이버', rank1: 'B+', score1: '85'},
-  {id: 5, name: '5', category: '이마트', rank1: 'B+', score1: '85'}
 ]
 
 // 탄소 배출권 데이터 상태 추가
@@ -147,17 +120,21 @@ export default function Dashboard() {
     check()
   }, [])
 
-  const [organizationList, setOrganizationList] = useState<OrganizationInfo[]>([])
+  // const [organizationList, setOrganizationList] = useState<OrganizationInfo[]>([])
   const [organizationRank, setOrganizationRank] = useState<OrganizationRank[]>([])
+  const [companyinfo, setCompanyInfo] = useState<InterestCompanyInfo[]>()
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const ioData = await getInterestOrganization()
+        // const ioData = await getInterestOrganization()
         const orData = await getOrganizationRank()
+        const companyInfoData = await getInterestCompanyInfo()
 
-        if (ioData) setOrganizationList(ioData?.organizationList || [])
-        else return null
+        setCompanyInfo(companyInfoData || [])
+
+        // if (ioData) setOrganizationList(ioData?.organizationList || [])
+        // else return null
 
         if (orData) setOrganizationRank(orData || [])
         else return null
@@ -322,18 +299,22 @@ export default function Dashboard() {
                 관심 기업 리스트
               </Text>
 
-              <Button variant="ghost">
-                {' '}
-                <GoPlus />
-                기업추가
-              </Button>
+              <Box>
+                <SearchOrg
+                  label={
+                    <>
+                      <GoPlus />
+                      기업추가
+                    </>
+                  }
+                />
+              </Box>
             </Flex>
             <Separator variant="solid" size="lg" padding={1} w="full" />
             <Table.Root size="sm">
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeader p={2} fontWeight="bold" textAlign="center">
-                    {' '}
                     기업명
                   </Table.ColumnHeader>
                   <Table.ColumnHeader p={2} fontWeight="bold" textAlign="center">
@@ -345,19 +326,21 @@ export default function Dashboard() {
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                {organizationList &&
-                  organizationList.map(likeitems => (
-                    <Table.Row key={likeitems.organization.id}>
+                {companyinfo &&
+                  companyinfo.map((likeitems, index) => (
+                    <Table.Row key={index}>
                       <Table.Cell p={2} textAlign="center">
-                        {likeitems.organization.companyName}
+                        <Link
+                          href={`/dashboard/companyInfo/${likeitems.interestOrganization.organizationId}`}>
+                          {likeitems.companyInfo.companyName}
+                        </Link>
+                      </Table.Cell>
+
+                      <Table.Cell p={2} textAlign="center">
+                        {likeitems.companyInfo.industry}
                       </Table.Cell>
                       <Table.Cell p={2} textAlign="center">
-                        {/* {likeitems.organization.industry} */}
-                        {0}
-                      </Table.Cell>
-                      <Table.Cell p={2} textAlign="center">
-                        {/* {likeitems.organization.capital} */}
-                        {0}
+                        {likeitems.companyInfo.capital}
                       </Table.Cell>
                     </Table.Row>
                   ))}

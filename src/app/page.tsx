@@ -1,6 +1,6 @@
 // pages/index.tsx
 'use client'
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {
   Box,
   Button,
@@ -31,6 +31,7 @@ import {
   BarChart,
   Bar
 } from 'recharts'
+import {checkLogin} from '@/lib/api/auth'
 const mockData = [
   {name: '1월', ESG: 40, 예측: 42},
   {name: '2월', ESG: 55, 예측: 58},
@@ -98,8 +99,16 @@ function FullSection({children, id}: SectionProps) {
 }
 
 export default function Home() {
+  const [login, setLogin] = useState<boolean>(false)
   const isMobile = useBreakpointValue({base: true, md: false})
 
+  useEffect(() => {
+    const fetchLoginStatus = async () => {
+      const status = await checkLogin()
+      setLogin(status)
+    }
+    fetchLoginStatus()
+  }, [])
   // 다음 섹션으로 스크롤
   const scrollToNext = () => {
     document.getElementById('section-1')?.scrollIntoView({behavior: 'smooth'})
@@ -134,9 +143,9 @@ export default function Home() {
             <Text fontSize="lg" mt={4} color="gray.600">
               기술과 데이터로 기업의 지속 가능성을 높이는 솔루션을 제공합니다.
             </Text>
-            <Link href="/login" passHref>
+            <Link href={login ? '/dashboard' : '/login'} passHref>
               <Button mt={6} colorScheme="purple" size="lg" borderRadius="full">
-                지금 시작하기
+                {login ? '대시보드' : '지금 시작하기'}
               </Button>
             </Link>
           </Box>
@@ -197,7 +206,7 @@ export default function Home() {
           </Flex>
         </Box>
       </FullSection>
-      (
+
       <FullSection id="section-1">
         <Box w="full" maxW="6xl" px={6} mx="auto">
           <Heading size="lg" mb={10} textAlign="center">

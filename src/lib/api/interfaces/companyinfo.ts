@@ -1,3 +1,5 @@
+import {interestOrganization} from './interestOrganization'
+
 export interface CompanyInfo {
   companyName: string
   industry: string // 산업
@@ -13,4 +15,9 @@ export interface CompanyInfo {
   address: string // 본사 주소
   affiliates: string[] // 계열사 목록
   revenue: string // 매출액
+}
+
+export interface InterestCompanyInfo {
+  interestOrganization: interestOrganization
+  companyInfo: CompanyInfo
 }

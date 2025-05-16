@@ -45,11 +45,13 @@ import {getCompanyInfo, getInterestOrganization} from '@/lib/api/get'
 import {postInteresrtOrganization} from '@/lib/api/post'
 import {deleteInterestOrganization} from '@/lib/api/delete'
 import {
+  InterestButtonProps,
   OrganizationInfo,
   OrganizationInfoResponse
 } from '@/lib/api/interfaces/interestOrganization'
 import {FcLikePlaceholder} from 'react-icons/fc'
 import {FcLike} from 'react-icons/fc'
+import InterestButton from '../etcs/InterestButton'
 
 // 가짜 데이터
 const mockSummary = [
@@ -71,7 +73,12 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
   const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
   const [showMore, setShowMore] = useState(false)
-  const [ioCheck, setIoCheck] = useState<Boolean>(false)
+  // const [ioCheck, setIoCheck] = useState<Boolean>(false)
+
+  const [btnState, setBtnState] = useState<InterestButtonProps>({
+    orgId: orgId || '',
+    interest: false
+  })
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,7 +94,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
             return org.organization.id === orgId
           })
         ) {
-          setIoCheck(true)
+          setBtnState({orgId: orgId, interest: true})
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -95,24 +102,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
     }
     fetchData()
   }, [])
-  const addButton = async () => {
-    try {
-      const data = await postInteresrtOrganization(orgId)
-      setIoCheck(true)
-      console.log('관심기업 등록 성공:', data)
-    } catch (error) {
-      console.error('관심기업 등록 실패:', error)
-    }
-  }
-  const deleteButton = async () => {
-    try {
-      const data = await deleteInterestOrganization(orgId)
-      setIoCheck(false)
-      console.log('관심기업 삭제 성공:', data)
-    } catch (error) {
-      console.error('관심기업 삭제 실패:', error)
-    }
-  }
+
   const handleDateRangeClick = (months: number) => {
     const now = new Date()
     const start = new Date()
@@ -174,12 +164,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
               <Text fontSize="lg" fontWeight="bold">
                 {companyinfo?.companyName}
               </Text>
-              <Button
-                color="black"
-                bg="white"
-                onClick={() => (ioCheck ? deleteButton() : addButton())}>
-                {ioCheck ? <FcLike /> : <FcLikePlaceholder />}
-              </Button>
+              <InterestButton {...btnState} />
             </Flex>
 
             <Separator variant="solid" size="lg" padding={1} w="full" />
