@@ -29,6 +29,7 @@ import {useRouter} from 'next/navigation'
 import {checkLogin} from '@/lib/api/auth'
 import SearchOrg from '@/components/navbar/SearchOrg'
 import {CompanyInfo, InterestCompanyInfo} from '@/lib/api/interfaces/companyinfo'
+import {Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts'
 
 const items = [
   {id: 1, name: '제조업', category: '삼성전자', category1: 'SK하이닉스'},
