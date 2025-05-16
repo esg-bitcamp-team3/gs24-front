@@ -3,10 +3,12 @@
 
 import {Avatar, Box, Button, Flex, IconButton, Image} from '@chakra-ui/react'
 import {useRouter} from 'next/navigation'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {LuLogOut, LuSearch} from 'react-icons/lu'
 import {logout} from '@/lib/api/auth'
 import SearchOrg from './navbar/SearchOrg'
+import { Company } from '@/lib/api/interfaces/organizations'
+import { getOrganizations } from '@/lib/api/get'
 
 // 백엔드에서 받아온 회사 리스트의 타입을 정의
 
