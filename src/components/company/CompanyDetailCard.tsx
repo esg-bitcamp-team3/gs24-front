@@ -10,10 +10,12 @@ import {
   Badge,
   Link,
   Table,
+  useDisclosure,
   Button,
-  SimpleGrid
+  SimpleGrid,
+  ButtonGroup
 } from '@chakra-ui/react'
-
+import {Dialog} from '@chakra-ui/react'
 import React, {useEffect, useState} from 'react'
 import {
   Chart as ChartJS,
@@ -69,7 +71,6 @@ const keywordNews = [
 const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-
   const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
   const [esgRatings, setEsgRatings] = useState<EsgRatingResponse | null>(null)
   const [showMore, setShowMore] = useState(false)
@@ -79,6 +80,9 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
     orgId: orgId || '',
     interest: false
   })
+
+  // ✅ 여기!
+  const {open, onOpen, onClose} = useDisclosure()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -162,7 +166,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
           <VStack align="center" px="6" width="full" height="full">
             <Flex w="full" flexDirection="row" justify="space-between">
               <Text fontSize="lg" fontWeight="bold">
-                {companyinfo?.companyName}
+                {companyinfo?.companyName}{' '}
               </Text>
               <InterestButton {...btnState} />
             </Flex>
@@ -322,45 +326,6 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
           </Box>
 
           <Flex direction={{base: 'column', md: 'row'}} gap={4}>
-            <Box p={3} borderRadius="lg" boxShadow="lg" flex="1" backgroundColor="white">
-              <VStack align="start">
-                <Text fontSize="lg" fontWeight="bold">
-                  ESG 예상 등급
-                </Text>
-                <Separator size="lg" w="full" />
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  mt={5}
-                  ml={8}
-                  h={280}>
-                  <Box
-                    borderRadius="full"
-                    borderColor="blue.400"
-                    borderWidth="4px"
-                    width="150px"
-                    height="150px"
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center">
-                    <Box
-                      borderRadius="full"
-                      borderColor="blue.300"
-                      borderWidth="4px"
-                      width="100px"
-                      height="100px"
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center">
-                      <Text fontSize="3xl" fontWeight="bold" color="green.700">
-                        {esgGrade}
-                      </Text>
-                    </Box>
-                  </Box>
-                </Box>
-              </VStack>
-            </Box>
             {/* 등급 변화 추이 그래프================================================================== */}
 
             <Box p={3} borderRadius="lg" boxShadow="lg" flex="2" backgroundColor="white">
@@ -432,6 +397,20 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
           </VStack>
         </Box>
       </Flex>
+      <Dialog.Root>
+        <Dialog.Trigger />
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.CloseTrigger />
+            <Dialog.Header>
+              <Dialog.Title />
+            </Dialog.Header>
+            <Dialog.Body />
+            <Dialog.Footer />
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
     </Flex>
   )
 }

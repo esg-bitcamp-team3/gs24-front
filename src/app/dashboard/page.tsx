@@ -1,5 +1,19 @@
 'use client'
-import {Box, Flex, Separator, Text} from '@chakra-ui/react'
+
+import {
+  Box,
+  chakra,
+  DataList,
+  Flex,
+  HStack,
+  Input,
+  Separator,
+  Spinner,
+  Text,
+  VStack
+} from '@chakra-ui/react'
+import {BiCaretUp} from 'react-icons/bi'
+
 import axios from 'axios'
 import {Table} from '@chakra-ui/react'
 import React, {useState, useEffect, use} from 'react'
@@ -34,75 +48,77 @@ const terms = [
     tags: []
   }
 ]
-
-const useExchangeRate = () => {
-  const [rate, setRate] = useState<number | null>(null)
-
-  useEffect(() => {
-    const apiKey = 'AGwwJzmJSGLew9fKMqtJ9pd2DcitjALm'
-    const fetchRate = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.exchangerate-api.com/v4/latest/USD?apikey=${apiKey}`
-        )
-        setRate(response.data.rates.KRW)
-      } catch (error) {
-        console.error('환율 데이터를 불러오는 데 실패했습니다.', error)
-      }
-    }
-
-    fetchRate()
-  }, [])
-
-  return rate
+interface ExchangeRateItem {
+  date: string
+  rate: number
 }
-export const useExchangeData = () => {
-  const [data, setData] = useState([])
+
+export const useExchangeRateHistory = () => {
+  const [data, setData] = useState<ExchangeRateItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<null | string>(null)
 
   useEffect(() => {
     const fetch = async () => {
-      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
-      const res = await axios.get(
-        'https://www.koreaexim.go.kr/site/program/financial/exchangeJSON',
-        {
-          params: {
-            authkey: process.env.NEXT_PUBLIC_EXCHANGE_RATE_API_KEY,
-            searchdate: today,
-            data: 'AP01'
-          }
-        }
-      )
-      setData(res.data)
-      setLoading(false)
+      try {
+        const res = await axios.get(
+          `http://localhost:8000/api/market-price/exchange-rate`
+        )
+        const rawData = res.data
+
+        const parsed = rawData
+          .map((entry: any) => {
+            const usd = entry.data.find((d: any) => d.cur_unit === 'USD')
+            if (!usd || !usd.deal_bas_r) return null
+
+            return {
+              date: entry.date,
+              rate: parseFloat(usd.deal_bas_r.replace(',', ''))
+            }
+          })
+          .filter(Boolean) // null 제거
+
+        setData(parsed.reverse()) // 최신 → 오래된 순서로 정렬
+      } catch (err: any) {
+        console.error('환율 불러오기 실패:', err)
+        setError('환율 데이터를 불러오는 중 오류가 발생했습니다.')
+      } finally {
+        setLoading(false)
+      }
     }
 
     fetch()
   }, [])
 
-  return {data, loading}
+  return {data, loading, error}
 }
+
 // ==============================
 // 환율 박스 컴포넌트
 // ==============================
-const ExchangeRateBox = () => {
-  const rate = useExchangeRate()
+const ExchangeRateChart = () => {
+  const {data, loading, error} = useExchangeRateHistory()
 
   return (
-    <Box p={5} borderRadius="lg" boxShadow="lg" w="md" h="300px" backgroundColor="white">
+    <Box p={4} bg="white" borderRadius="lg" shadow="md" w="full" h="300px">
       <Text fontSize="lg" fontWeight="bold" mb={3}>
-        시장지표
+        최근 5일 USD → KRW 환율
       </Text>
-      <Separator variant="solid" size="lg" padding={1} w="full" />
-      <Box mt={4}>
-        {rate ? (
-          <Text fontSize="md">USD → KRW 환율: {rate.toFixed(2)}원</Text>
-        ) : (
-          <Text fontSize="sm" color="gray.500">
-            환율 정보를 불러오는 중...
-          </Text>
-        )}
-      </Box>
+
+      {loading ? (
+        <Spinner />
+      ) : error ? (
+        <Text color="red.500">{error}</Text>
+      ) : (
+        <ResponsiveContainer width="100%" height="80%">
+          <LineChart data={data}>
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Line type="monotone" dataKey="rate" stroke="#3182ce" strokeWidth={2} />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </Box>
   )
 }
@@ -247,7 +263,7 @@ export default function Dashboard() {
           p={5}
           borderRadius="lg"
           boxShadow="lg"
-          w="md"
+          w="5xl"
           h="300px"
           backgroundColor="white">
           <Text fontSize="lg" fontWeight="bold" alignSelf="flex-start" mb={3}>
@@ -291,7 +307,7 @@ export default function Dashboard() {
             p={5}
             borderRadius="lg"
             boxShadow="lg"
-            w="7xl"
+            w="5xl"
             h="300px"
             backgroundColor="white">
             <Flex justifyContent="space-between">
@@ -350,7 +366,7 @@ export default function Dashboard() {
 
           {/* ESG 섹션 */}
         </Flex>
-        <ExchangeRateBox />
+        <ExchangeRateChart />
       </Flex>
 
       {/* 키워드 및 뉴스 영역 */}
