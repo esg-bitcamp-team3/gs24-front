@@ -1,7 +1,6 @@
 'use client'
 
-import CompanyInfoCard from '@/components/company/CompanyDetailCard'
-import {Box} from '@chakra-ui/react'
+import CompanyInfoCard from '@/components/company/CompanyInfolCard'
 import { use } from 'react'
 
 interface Props {

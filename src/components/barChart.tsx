@@ -5,16 +5,11 @@ import * as d3 from 'd3'
 
 const convertGradeToNumber = (grade: string): number => {
   const gradeMap: {[key: string]: number} = {
-    'A+': 10,
-    A: 9,
-    'A-': 8,
-    'B+': 7,
-    B: 6,
-    'B-': 5,
-    'C+': 4,
-    C: 3,
-    'C-': 2,
-    'D+': 1,
+    'A+': 5,
+    A: 4,
+    'B+': 3,
+    B: 2,
+    C: 1,
     D: 0
   }
   return gradeMap[grade.toUpperCase()] ?? 0
@@ -68,25 +63,28 @@ export const EsgBarData = ({
 
     d3.select(svgRef.current).selectAll('*').remove()
 
-    const margin = {top: 10, right: 15, bottom: 30, left: 20}
-    const width = 350 - margin.left - margin.right
-    const height = 80 - margin.top - margin.bottom
+    const margin = {top: 5, right: 15, bottom: 5, left: 20}
+    const container = svgRef.current?.parentElement
+    const fullWidth = container?.clientWidth ?? 350
+    const fullHeight = container?.clientHeight ?? 80
+    const width = fullWidth - margin.left - margin.right
+    const height = fullHeight - margin.top - margin.bottom
 
     const svg = d3
       .select(svgRef.current)
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
+      .attr('width', fullWidth)
+      .attr('height', fullHeight)
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`)
 
     // 스케일 조정
-    const x = d3.scaleLinear().domain([0, 10]).range([0, width])
+    const x = d3.scaleLinear().domain([0, 6]).range([0, width])
 
     const y = d3
       .scaleBand()
       .domain(data.map(d => d.key))
       .range([0, height])
-      .padding(0.4)
+      .padding(0.5)
 
     const colors: Record<string, string> = {
       E: 'rgba(72, 187, 120, 1)',
@@ -99,6 +97,7 @@ export const EsgBarData = ({
       .attr('transform', `translate(0, 0)`)
       .call(d3.axisLeft(y))
       .style('font-size', '12px')
+      .call(g => g.select('.domain').remove())
 
     // //x축 등급
     // svg
@@ -129,21 +128,42 @@ export const EsgBarData = ({
       .attr('width', d => x(d.value))
       .attr('fill', d => colors[d.key])
 
+    // 숫자를 등급으로 변환하는 함수 추가
+    const convertNumberToGrade = (value: number): string => {
+      const grades = {
+        5: 'A+',
+        4: 'A',
+        3: 'B+',
+        2: 'B',
+        1: 'C',
+        0: 'D'
+      }
+      return grades[value as keyof typeof grades] || '-'
+    }
+
     // 텍스트 레이블 추가
     svg
       .selectAll('.label')
       .data(data)
       .enter()
       .append('text')
-      .attr('y', d => y(d.key)! + y.bandwidth() / 2 + 4)
+      .attr('y', d => y(d.key)! + y.bandwidth() / 2 + 2)
       .attr('x', d => x(d.value) + 3) // 레이블 위치
-      .text(d => d.value)
-      .style('font-size', '11px')
+      // .text(d => d.value)
+      .text(d => convertNumberToGrade(d.value))
+      .style('font-size', '15px')
+      .attr('full', d => colors[d.key])
   }
 
   return (
-    <Box width={'full'} height={'full'}>
-      <svg ref={svgRef}></svg>
+    <Box
+      width="full"
+      height="full"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      overflow={'auto'}>
+      <svg width={'full'} height={'80px'} ref={svgRef}></svg>
     </Box>
   )
 }

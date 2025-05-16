@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
 
   const handleCompanyClick = (companyId: string) => {
     setIsOpen(false)
-    router.push(`/dashboard/companyInfo/${companyId}`)
+    router.push(`/dashboard/${companyId}/companyInfo`)
   }
 
   const filteredCompanies =
