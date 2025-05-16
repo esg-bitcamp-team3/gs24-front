@@ -5,7 +5,7 @@ import {useRouter} from 'next/navigation'
 import {FaNetworkWired, FaRegBuilding} from 'react-icons/fa'
 import {FaPeopleGroup} from 'react-icons/fa6'
 import {LuChevronDown, LuEarth, LuLeaf, LuNewspaper} from 'react-icons/lu'
-import { cursorTo } from 'readline'
+import {cursorTo} from 'readline'
 
 export default function SideBar() {
   const router = useRouter()
@@ -26,59 +26,32 @@ export default function SideBar() {
           variant="ghost"
           color="black"
           justifyContent="flex-start"
-          onClick={() => router.push('/dashboard/companyInfo/{companyId}')}>
+          onClick={() => router.push('/dashboard/{companyId}/companyInfo')}>
           <Text fontSize="lg" fontWeight="bold">
             <Icon as={FaRegBuilding} boxSize={5} mr={2} />
             기업정보
           </Text>
         </Button>
 
-        <Accordion.Root collapsible variant={'plain'}>
-          <Accordion.Item value="item-1">
-            <Accordion.ItemTrigger justifyContent={'space-between'} _hover={{bg: 'gray.100', cursor: 'pointer'}} paddingY={2} >
-              <Text fontSize="lg" fontWeight="bold" >
-                <Icon as={LuEarth} boxSize={5} mr={2} />
-                ESG
-              </Text >
-              <Accordion.ItemIndicator />
-            </Accordion.ItemTrigger>
-
-            <Accordion.ItemContent paddingX={6}>
-              <Flex direction="column" gap={2} mt={2}>
-                <Button
-                  variant="ghost"
-                  color="black"
-                  justifyContent="flex-start"
-                  onClick={() => router.push('/dashboard/environmental')}>
-                  Environmental
-                </Button>
-                <Button
-                  variant="ghost"
-                  color="black"
-                  justifyContent="flex-start"
-                  onClick={() => router.push('/dashboard/social')}>
-                  Social
-                </Button>
-                <Button
-                  variant="ghost"
-                  color="black"
-                  justifyContent="flex-start"
-                  onClick={() => router.push('/dashboard/governance')}>
-                  Governance
-                </Button>
-              </Flex>
-            </Accordion.ItemContent>
-          </Accordion.Item>
-        </Accordion.Root>
+        <Button
+          variant="ghost"
+          color="black"
+          justifyContent="flex-start"
+          onClick={() => router.push('/dashboard/{companyId}/esgAnalysis')}>
+          <Text fontSize="lg" fontWeight="bold">
+            <Icon as={LuEarth} boxSize={5} mr={2} />
+            ESG 분석
+          </Text>
+        </Button>
 
         <Button
           variant="ghost"
           color="black"
           justifyContent="flex-start"
-          onClick={() => router.push('/dashboard/news')}>
+          onClick={() => router.push('/dashboard/{companyId}/keyword-trend')}>
           <Text fontSize="lg" fontWeight="bold">
             <Icon as={LuNewspaper} boxSize={5} mr={2} />
-            기업뉴스
+            키워드 트렌드
           </Text>
         </Button>
       </Flex>
