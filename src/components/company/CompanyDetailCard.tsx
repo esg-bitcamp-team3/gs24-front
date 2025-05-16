@@ -63,7 +63,7 @@ const keywordNews = [
   '국내외 ESG 펀드 삼성전자 비중 확대'
 ]
 
-const CompanyInfoCard = ({orgId}: {orgId: string}) => {
+const CompanyInfoDetailCard = ({orgId}: {orgId: string}) => {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
@@ -412,4 +412,4 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   )
 }
 
-export default CompanyInfoCard
+export default CompanyInfoDetailCard

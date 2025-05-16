@@ -1,7 +1,7 @@
 'use client'
 
-import CompanyInfoCard from '@/components/company/CompanyDetailCard'
-import {use} from 'react'
+import CompanyInfoCard from '@/components/company/CompanyInfolCard'
+import { use } from 'react'
 
 interface Props {
   params: Promise<{id: string}>

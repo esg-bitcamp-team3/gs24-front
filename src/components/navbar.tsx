@@ -3,15 +3,47 @@
 
 import {Avatar, Box, Button, Flex, IconButton, Image} from '@chakra-ui/react'
 import {useRouter} from 'next/navigation'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {LuLogOut, LuSearch} from 'react-icons/lu'
 import {logout} from '@/lib/api/auth'
 import SearchOrg from './navbar/SearchOrg'
+import { Company } from '@/lib/api/interfaces/organizations'
+import { getOrganizations } from '@/lib/api/get'
 
 // 백엔드에서 받아온 회사 리스트의 타입을 정의
 
 const Navbar: React.FC = () => {
   const router = useRouter()
+  const [searchTerm, setSearchTerm] = useState('')
+  const [companyList, setCompanyList] = useState<Company[]>([])
+  const [isOpen, setIsOpen] = useState(false)
+
+  const handleCompanyClick = (companyId: string) => {
+    setIsOpen(false)
+    router.push(`/dashboard/${companyId}/companyInfo`)
+  }
+
+  const filteredCompanies =
+    searchTerm === ''
+      ? companyList
+      : companyList.filter(company =>
+          company.companyName
+            .trim()
+            .toLowerCase()
+            .includes(searchTerm.trim().toLowerCase())
+        )
+
+  useEffect(() => {
+    const loadCompanies = async () => {
+      try {
+        const data = await getOrganizations()
+        setCompanyList(data)
+      } catch (error) {
+        console.error('Error fetching company list:', error)
+      }
+    }
+    loadCompanies()
+  }, [])
 
   const logoutbtn = () => {
     logout()
