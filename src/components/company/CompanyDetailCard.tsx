@@ -12,7 +12,7 @@ import {
   Button,
   SimpleGrid
 } from '@chakra-ui/react'
-import {Dialog} from '@chakra-ui/react'
+
 import React, {useEffect, useState} from 'react'
 import {
   Chart as ChartJS,
@@ -24,6 +24,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js'
+import RealTimeChart from '@/components/company/RealTimeChart'
 
 ChartJS.register(
   CategoryScale,
@@ -47,7 +48,7 @@ import {
 } from '@/lib/api/interfaces/interestOrganization'
 
 import InterestButton from '../etcs/InterestButton'
-import EmotionCard from './emotion'
+import {CloseButton, Portal} from '@chakra-ui/react'import EmotionCard from './emotion'
 import OpenDart from './openDart'
 
 // 가짜 데이터
@@ -165,6 +166,7 @@ const CompanyInfoDetailCard = ({orgId}: {orgId: string}) => {
                 {companyinfo?.companyName}{' '}
               </Text>
               <OpenDart orgCode="" />
+
               <InterestButton {...btnState} />
             </Flex>
 
@@ -339,7 +341,11 @@ const CompanyInfoDetailCard = ({orgId}: {orgId: string}) => {
                 주식가격
               </Text>
               <Separator size="lg" w="full" />
-              <VStack align="start" mt={2}></VStack>
+              <VStack align="start" mt={2}>
+                <main className="p-10">
+                  <RealTimeChart />
+                </main>
+              </VStack>
             </Box>
           </Flex>
         </Flex>
@@ -394,20 +400,6 @@ const CompanyInfoDetailCard = ({orgId}: {orgId: string}) => {
           </VStack>
         </Box>
       </Flex>
-      <Dialog.Root>
-        <Dialog.Trigger />
-        <Dialog.Backdrop />
-        <Dialog.Positioner>
-          <Dialog.Content>
-            <Dialog.CloseTrigger />
-            <Dialog.Header>
-              <Dialog.Title />
-            </Dialog.Header>
-            <Dialog.Body />
-            <Dialog.Footer />
-          </Dialog.Content>
-        </Dialog.Positioner>
-      </Dialog.Root>
     </Flex>
   )
 }
