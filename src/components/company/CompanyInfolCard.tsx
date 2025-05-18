@@ -14,11 +14,12 @@ import {deleteInterestOrganization} from '@/lib/api/delete'
 import {OrganizationInfo} from '@/lib/api/interfaces/interestOrganization'
 
 import {InfoItem} from '../InfoItem'
+import InterestButton from '../etcs/InterestButton'
 
 const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
   const [showMore, setShowMore] = useState(false)
-  const [ioCheck, setIoCheck] = useState<Boolean>(false)
+  // const [ioCheck, setIoCheck] = useState<Boolean>(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,41 +28,21 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
         if (ciData) setCompanyInfo(ciData || null)
         else return null
 
-        const checkId = await getInterestOrganization()
+        // const checkId = await getInterestOrganization()
 
-        if (
-          checkId?.organizationList.find((org: OrganizationInfo) => {
-            return org.organization.id === orgId
-          })
-        ) {
-          setIoCheck(true)
-        }
+        // if (
+        //   checkId?.organizationList.find((org: OrganizationInfo) => {
+        //     return org.organization.id === orgId
+        //   })
+        // ) {
+        //   setIoCheck(true)
+        // }
       } catch (error) {
         console.error('Error fetching data:', error)
       }
     }
     fetchData()
   }, [])
-
-  const addButton = async () => {
-    try {
-      const data = await postInteresrtOrganization(orgId)
-      setIoCheck(true)
-      console.log('관심기업 등록 성공:', data)
-    } catch (error) {
-      console.error('관심기업 등록 실패:', error)
-    }
-  }
-
-  const deleteButton = async () => {
-    try {
-      const data = await deleteInterestOrganization(orgId)
-      setIoCheck(false)
-      console.log('관심기업 삭제 성공:', data)
-    } catch (error) {
-      console.error('관심기업 삭제 실패:', error)
-    }
-  }
 
   const [keywordNews, setKeywordNews] = useState<{title: string; link: string}[]>([])
   const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null)
@@ -102,6 +83,7 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
         <Text fontSize="3xl" fontWeight="bold">
           {companyinfo?.companyName}
         </Text>
+        <InterestButton orgId={orgId} />
       </Flex>
       <Box {...CARD_STYLES} p={6} w={{base: '100%', md: '100%'}}>
         <Flex justify={'space-between'}>

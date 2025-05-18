@@ -26,7 +26,8 @@ const SearchOrg = ({label}: SearchOrgProps) => {
 
   const handleCompanyClick = (companyId: string) => {
     setIsOpen(false)
-    router.push(`/dashboard/companyInfo/${companyId}`)
+    // router.push(`/dashboard/companyInfo/${companyId}`)
+    router.push(`/corporation/${companyId}/companyInfo`)
   }
 
   const filteredCompanies =
@@ -135,7 +136,7 @@ const SearchOrg = ({label}: SearchOrgProps) => {
                       </Button>
                       <InterestButton
                         orgId={company.organization.id}
-                        interest={company.interested}
+                        // interest={company.interested}
                       />
                     </Box>
                   ))

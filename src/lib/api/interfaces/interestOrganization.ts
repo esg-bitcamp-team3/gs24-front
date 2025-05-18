@@ -27,5 +27,4 @@ export interface interestOrganization {
 
 export interface InterestButtonProps {
   orgId: string
-  interest: Boolean
 }

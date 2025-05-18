@@ -1,14 +1,15 @@
 'use client'
 
-import {Accordion, AccordionItem, Box, Flex, Button, Icon, Text} from '@chakra-ui/react'
-import {useRouter} from 'next/navigation'
-import {FaNetworkWired, FaRegBuilding} from 'react-icons/fa'
-import {FaPeopleGroup} from 'react-icons/fa6'
-import {LuChevronDown, LuEarth, LuLeaf, LuNewspaper} from 'react-icons/lu'
-import {cursorTo} from 'readline'
+import {Flex, Button, Icon, Text} from '@chakra-ui/react'
+import {useParams, useRouter} from 'next/navigation'
+import {FaRegBuilding} from 'react-icons/fa'
+import {LuEarth, LuNewspaper} from 'react-icons/lu'
 
 export default function SideBar() {
   const router = useRouter()
+  const params = useParams()
+  const companyId = params?.id
+
   return (
     <Flex
       position="fixed"
@@ -26,7 +27,8 @@ export default function SideBar() {
           variant="ghost"
           color="black"
           justifyContent="flex-start"
-          onClick={() => router.push('/dashboard/{companyId}/companyInfo')}>
+          // onClick={() => router.push('/dashboard/{companyId}/companyInfo')}>
+          onClick={() => router.push(`/corporation/${companyId}/companyInfo`)}>
           <Text fontSize="lg" fontWeight="bold">
             <Icon as={FaRegBuilding} boxSize={5} mr={2} />
             기업정보
@@ -37,7 +39,8 @@ export default function SideBar() {
           variant="ghost"
           color="black"
           justifyContent="flex-start"
-          onClick={() => router.push('/dashboard/{companyId}/esgAnalysis')}>
+          // onClick={() => router.push('/dashboard/{companyId}/esgAnalysis')}>
+          onClick={() => router.push(`/corporation/${companyId}/esgAnalysis`)}>
           <Text fontSize="lg" fontWeight="bold">
             <Icon as={LuEarth} boxSize={5} mr={2} />
             ESG 분석
@@ -48,7 +51,8 @@ export default function SideBar() {
           variant="ghost"
           color="black"
           justifyContent="flex-start"
-          onClick={() => router.push('/dashboard/{companyId}/keyword-trend')}>
+          // onClick={() => router.push('/dashboard/{companyId}/keyword-trend')}>
+          onClick={() => router.push(`/corporation/${companyId}/keyword-trend`)}>
           <Text fontSize="lg" fontWeight="bold">
             <Icon as={LuNewspaper} boxSize={5} mr={2} />
             키워드 트렌드
