@@ -48,7 +48,8 @@ import {
 } from '@/lib/api/interfaces/interestOrganization'
 
 import InterestButton from '../etcs/InterestButton'
-import {CloseButton, Portal} from '@chakra-ui/react'import EmotionCard from './emotion'
+import {CloseButton, Portal} from '@chakra-ui/react'
+import EmotionCard from './emotion'
 import OpenDart from './openDart'
 
 // 가짜 데이터
@@ -72,8 +73,8 @@ const CompanyInfoDetailCard = ({orgId}: {orgId: string}) => {
   // const [ioCheck, setIoCheck] = useState<Boolean>(false)
 
   const [btnState, setBtnState] = useState<InterestButtonProps>({
-    orgId: orgId || '',
-    interest: false
+    orgId: orgId || ''
+    // interest: false
   })
 
   // ✅ 여기!
@@ -93,7 +94,7 @@ const CompanyInfoDetailCard = ({orgId}: {orgId: string}) => {
             return org.organization.id === orgId
           })
         ) {
-          setBtnState({orgId: orgId, interest: true})
+          setBtnState({orgId: orgId})
         }
       } catch (error) {
         console.error('Error fetching data:', error)
