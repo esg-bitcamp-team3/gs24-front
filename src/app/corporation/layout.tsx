@@ -3,7 +3,7 @@ import NavBar from '@/components/navbar'
 import SideBar from '@/components/sideBar'
 import {Box, Flex} from '@chakra-ui/react'
 
-export default function Dashboard({children}: {children: React.ReactNode}) {
+export default function Corporation({children}: {children: React.ReactNode}) {
   return (
     <>
       <NavBar />
