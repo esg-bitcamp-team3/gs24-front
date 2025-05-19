@@ -172,14 +172,6 @@ export default function ESGWordCloud({query, onWordClick}: ESGWordCloudProps) {
 
   return (
     <Box position="relative" borderRadius="lg" boxShadow="sm" p={4} overflow="hidden">
-      <Flex justify="flex-end" mb={2}>
-        <Tooltip
-          content="키워드를 클릭하면 관련 뉴스를 볼 수 있습니다"
-          positioning={{placement: 'top'}}>
-          <LuInfo color="gray.400" />
-        </Tooltip>
-      </Flex>
-
       <Box overflow="hidden" className="wordcloud-container">
         <WordCloud
           key={refreshKey}
@@ -189,11 +181,11 @@ export default function ESGWordCloud({query, onWordClick}: ESGWordCloudProps) {
           rotate={0}
           width={600}
           height={300}
-          fontStyle="bold"
+          font="Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif"
+          fontWeight={600}
           padding={2}
           onWordClick={handleWordClick}
           onWordMouseOver={word => {
-            console.log(`onWordMouseOver: ${word.target.textContent}`)
             word.target.classList.add('word-over')
             const wordData = data.find(d => d.text === word.target.textContent)
             if (wordData) {
@@ -201,7 +193,6 @@ export default function ESGWordCloud({query, onWordClick}: ESGWordCloudProps) {
             }
           }}
           onWordMouseOut={word => {
-            console.log(`onWordMouseOut: ${word.target.textContent}`)
             word.target.classList.remove('word-over')
             const wordData = data.find(d => d.text === word.target.textContent)
             if (wordData) {
@@ -218,9 +209,11 @@ export default function ESGWordCloud({query, onWordClick}: ESGWordCloudProps) {
         .word-selected {
           fill: #ff6347 !important; /* Tomato color */
           font-weight: bold !important;
+          transition: fill 0.3s ease, font-weight 0.3s ease;
         }
         .word-over {
           font-weight: bold !important;
+          transition: font-weight 0.3s ease;
         }
       `}</style>
     </Box>

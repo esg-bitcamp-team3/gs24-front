@@ -28,6 +28,8 @@ import {InfoIcon} from '@chakra-ui/icons'
 import {InfoItem} from '../InfoItem'
 import EmotionCard from './emotion'
 import KeywordNews from './KeywordNews'
+import {Tooltip} from '../ui/tooltip'
+import {LuInfo} from 'react-icons/lu'
 
 const KeywordTrendCard = ({orgId}: {orgId: string}) => {
   const [corporation, setCorporation] = useState<CompanyOverview>()
@@ -102,14 +104,23 @@ const KeywordTrendCard = ({orgId}: {orgId: string}) => {
       </Flex>
       {/* 긍정 부정 ================================================================== */}
       <Box {...CARD_STYLES} p={6} w={{base: '100%', md: '30%'}}>
-        <EmotionCard orgname={corporation?.corp_name || ''} />
+        {corporation?.corp_name && <EmotionCard orgname={corporation?.corp_name} />}
       </Box>
       <Flex direction={{base: 'column', md: 'row'}} gap={8}>
         {/* 관련 키워드 ================================================================== */}
         <Box {...CARD_STYLES} p={6} w={{base: '100%', md: '60%'}}>
-          <Text {...HEADING_STYLES} textAlign="center" mb={4}>
-            기업 관련 키워드
-          </Text>
+          <Flex justify={'center'} align={'center'} mb={4} gap={4}>
+            <Text {...HEADING_STYLES} textAlign="center">
+              기업 관련 키워드
+            </Text>
+            <Tooltip
+              content="키워드를 클릭하면 관련 뉴스를 볼 수 있습니다"
+              positioning={{placement: 'bottom'}}
+              openDelay={10}
+              closeDelay={100}>
+              <LuInfo color="gray.400" />
+            </Tooltip>
+          </Flex>
           <Center>
             <Box w="600px" h="300px">
               <ESGWordCloud
@@ -123,7 +134,7 @@ const KeywordTrendCard = ({orgId}: {orgId: string}) => {
         {/* 키워드 관련 뉴스 ================================================================== */}
         {/* 뉴스 섹션 */}
         <Box {...CARD_STYLES} p={6} w={{base: '100%', md: '40%'}}>
-          <Text {...HEADING_STYLES} mb={4}>
+          <Text {...HEADING_STYLES} textAlign="center" mb={4}>
             키워드 관련 뉴스
             {selectedKeyword && (
               <Text as="span" color="teal.500" ml={2}>

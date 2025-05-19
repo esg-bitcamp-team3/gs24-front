@@ -94,7 +94,7 @@ export default function KeywordNews({query, keyword}: {query: string; keyword?: 
     return (
       <Center py={6}>
         <VStack gap={3}>
-          <Spinner size="md" color="teal.500" />
+          <Spinner size="md" color="teal.500" borderWidth={'4px'} />
           <Text fontSize="sm" color="gray.600">
             뉴스를 불러오는 중입니다. 잠시만 기다려주세요
           </Text>
@@ -112,67 +112,69 @@ export default function KeywordNews({query, keyword}: {query: string; keyword?: 
   }
 
   return (
-    <VStack align="stretch" gap={3}>
-      {news.map((item, idx) => (
-        <Link
-          key={idx}
-          href={item.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          _hover={{textDecoration: 'none'}}>
-          <Box
-            p={3}
-            borderRadius="md"
-            border="1px solid"
-            borderColor="gray.200"
-            transition="all 0.2s"
-            _hover={{
-              bg: 'gray.50',
-              borderColor: 'teal.200',
-              transform: 'translateY(-2px)',
-              boxShadow: 'sm'
-            }}>
-            <Flex direction="column" gap={2}>
-              <Text fontWeight="medium" fontSize="sm" color="gray.800" maxLines={2}>
-                {item.title}
-              </Text>
-
-              {item.description && (
-                <Text fontSize="xs" color="gray.600" maxLines={1}>
-                  {item.description}
+    <Box maxH="400px" overflowY="auto">
+      <VStack align="stretch" gap={3} pb={6}>
+        {news.map((item, idx) => (
+          <Link
+            key={idx}
+            href={item.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            _hover={{textDecoration: 'none'}}>
+            <Box
+              p={3}
+              borderRadius="md"
+              border="1px solid"
+              borderColor="gray.200"
+              transition="all 0.2s"
+              _hover={{
+                bg: 'gray.50',
+                borderColor: 'teal.200',
+                transform: 'translateY(-2px)',
+                boxShadow: 'sm'
+              }}>
+              <Flex direction="column" gap={2}>
+                <Text fontWeight="medium" fontSize="sm" color="gray.800" maxLines={2}>
+                  {item.title}
                 </Text>
-              )}
 
-              <Flex justifyContent="space-between" alignItems="center">
-                {item.pubDate && (
-                  <Flex alignItems="center" gap={1}>
-                    <Icon size={'xs'} as={LuClock3} color="gray.500">
-                      <LuClock3 size={'xs'} color={'gray.500'} />
-                    </Icon>
-                    <Text fontSize="xs" color="gray.500">
-                      {formatDate(item.pubDate)}
-                    </Text>
-                  </Flex>
+                {item.description && (
+                  <Text fontSize="xs" color="gray.600" maxLines={1}>
+                    {item.description}
+                  </Text>
                 )}
 
-                <Flex alignItems="center" gap={1}>
-                  <Badge
-                    size="sm"
-                    colorScheme="teal"
-                    variant="subtle"
-                    fontSize="10px"
-                    px={2}>
-                    {keyword || query}
-                  </Badge>
-                  <Icon size={'xs'} as={LuClock3} color="gray.500">
-                    <LuExternalLink />
-                  </Icon>
+                <Flex justifyContent="space-between" alignItems="center">
+                  {item.pubDate && (
+                    <Flex alignItems="center" gap={1}>
+                      <Icon size={'xs'} color="gray.500">
+                        <LuClock3 size={'xs'} color={'gray.500'} />
+                      </Icon>
+                      <Text fontSize="xs" color="gray.500">
+                        {formatDate(item.pubDate)}
+                      </Text>
+                    </Flex>
+                  )}
+
+                  <Flex alignItems="center" gap={1}>
+                    <Badge
+                      size="sm"
+                      colorScheme="teal"
+                      variant="subtle"
+                      fontSize="10px"
+                      px={2}>
+                      {keyword || query}
+                    </Badge>
+                    <Icon size={'xs'} color="gray.500">
+                      <LuExternalLink />
+                    </Icon>
+                  </Flex>
                 </Flex>
               </Flex>
-            </Flex>
-          </Box>
-        </Link>
-      ))}
-    </VStack>
+            </Box>
+          </Link>
+        ))}
+      </VStack>
+    </Box>
   )
 }
