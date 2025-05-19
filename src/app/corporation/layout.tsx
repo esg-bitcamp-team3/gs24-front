@@ -7,7 +7,7 @@ export default function Corporation({children}: {children: React.ReactNode}) {
   return (
     <>
       <NavBar />
-      <SideBar />
+
       <Box mt={'65px'} p={8} overflow={'auto'} maxH={'full'} bg={'#f7f7f7'}>
         {children}
       </Box>

@@ -1,4 +1,5 @@
 import InterestButton from '@/components/etcs/InterestButton'
+import SideBar from '@/components/sideBar'
 import {getCompanyInfo} from '@/lib/api/get'
 import {Box, Flex, Separator, Text} from '@chakra-ui/react'
 import {notFound} from 'next/navigation'
@@ -17,6 +18,7 @@ export default async function CorpId({
   // }
   return (
     <>
+      <SideBar />
       <Box ml={'250px'} overflow={'auto'} maxW={'full'} maxH="full" bg={'#f7f7f7'}>
         {/* <Flex align="center" ml={4} gap={2}>
           <Separator orientation="vertical" height="1.75em" borderWidth="2px" />
