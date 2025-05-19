@@ -78,13 +78,13 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
 
   return (
     <Flex direction={{base: 'column', md: 'column'}} gap={8}>
-      <Flex align="center" ml={4} gap={2}>
+      {/* <Flex align="center" ml={4} gap={2}>
         <Separator orientation="vertical" height="1.75em" borderWidth="2px" />
         <Text fontSize="3xl" fontWeight="bold">
           {companyinfo?.companyName}
         </Text>
         <InterestButton orgId={orgId} />
-      </Flex>
+      </Flex> */}
       <Box {...CARD_STYLES} p={6} w={{base: '100%', md: '100%'}}>
         <Flex justify={'space-between'}>
           <Flex

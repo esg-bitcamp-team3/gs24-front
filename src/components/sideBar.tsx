@@ -27,8 +27,7 @@ export default function SideBar() {
           variant="ghost"
           color="black"
           justifyContent="flex-start"
-          // onClick={() => router.push('/dashboard/{companyId}/companyInfo')}>
-          onClick={() => router.push(`/corporation/${companyId}/companyInfo`)}>
+          onClick={() => router.push(`/dashboard/${companyId}/companyInfo`)}>
           <Text fontSize="lg" fontWeight="bold">
             <Icon as={FaRegBuilding} boxSize={5} mr={2} />
             기업정보
@@ -39,8 +38,7 @@ export default function SideBar() {
           variant="ghost"
           color="black"
           justifyContent="flex-start"
-          // onClick={() => router.push('/dashboard/{companyId}/esgAnalysis')}>
-          onClick={() => router.push(`/corporation/${companyId}/esgAnalysis`)}>
+          onClick={() => router.push(`/dashboard/${companyId}/esgAnalysis`)}>
           <Text fontSize="lg" fontWeight="bold">
             <Icon as={LuEarth} boxSize={5} mr={2} />
             ESG 분석
@@ -51,8 +49,7 @@ export default function SideBar() {
           variant="ghost"
           color="black"
           justifyContent="flex-start"
-          // onClick={() => router.push('/dashboard/{companyId}/keyword-trend')}>
-          onClick={() => router.push(`/corporation/${companyId}/keyword-trend`)}>
+          onClick={() => router.push(`/dashboard/${companyId}/keyword-trend`)}>
           <Text fontSize="lg" fontWeight="bold">
             <Icon as={LuNewspaper} boxSize={5} mr={2} />
             키워드 트렌드

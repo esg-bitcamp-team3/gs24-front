@@ -3,12 +3,12 @@
 
 import {Avatar, Box, Button, Flex, IconButton, Image} from '@chakra-ui/react'
 import {useRouter} from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import {LuLogOut, LuSearch} from 'react-icons/lu'
 import {logout} from '@/lib/api/auth'
 import SearchOrg from './navbar/SearchOrg'
-import { Company } from '@/lib/api/interfaces/organizations'
-import { getOrganizations } from '@/lib/api/get'
+import {Company} from '@/lib/api/interfaces/organizations'
+import {getOrganizations} from '@/lib/api/get'
 
 // 백엔드에서 받아온 회사 리스트의 타입을 정의
 
@@ -94,7 +94,7 @@ const Navbar: React.FC = () => {
           }
         />
         {/* 아바타================================================================== */}
-        <div onClick={() => router.push('/dashboard/myPage')} style={{cursor: 'pointer'}}>
+        <div onClick={() => router.push('/myPage')} style={{cursor: 'pointer'}}>
           <Avatar.Root shape="full" size="lg">
             <Avatar.Fallback name="Segun Adebayo" />
             <Avatar.Image src="https://cdn.myanimelist.net/r/84x124/images/characters/9/131317.webp?s=d4b03c7291407bde303bc0758047f6bd" />

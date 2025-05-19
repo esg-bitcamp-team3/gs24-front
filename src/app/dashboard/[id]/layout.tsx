@@ -11,7 +11,15 @@ export default async function CorpId({
   children: React.ReactNode
   params: {id: string}
 }) {
-  // const companyinfo = await getCompanyInfo(params.id)
+  // try {
+  //   const companyinfo = await getCompanyInfo(params.id)
+  //   if (!companyinfo) {
+  //     notFound()
+  //   }
+  // } catch (error) {
+  //   console.error('Error fetching company info:', error)
+  //   notFound()
+  // }
 
   // if (!companyinfo) {
   //   notFound()
@@ -20,13 +28,16 @@ export default async function CorpId({
     <>
       <SideBar />
       <Box ml={'250px'} overflow={'auto'} maxW={'full'} maxH="full" bg={'#f7f7f7'}>
-        {/* <Flex align="center" ml={4} gap={2}>
+        <Flex align="center" ml={4} gap={2} mb={4}>
           <Separator orientation="vertical" height="1.75em" borderWidth="2px" />
           <Text fontSize="3xl" fontWeight="bold">
-            {companyinfo?.companyName}
+            {/* {companyinfo?.companyName} */}
+            기업정보
           </Text>
-          <InterestButton orgId={params.id} />
-        </Flex> */}
+          <Box ml={4}>
+            <InterestButton orgId={params.id} />
+          </Box>
+        </Flex>
         {children}
       </Box>
     </>
