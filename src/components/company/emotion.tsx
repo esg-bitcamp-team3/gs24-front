@@ -22,7 +22,7 @@ const EmotionCard = ({orgname}: Props) => {
   const getEmotion = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/naver-api/sentiment?query=${orgname}&display=${getContent}`
+        `http://localhost/search/search/sentiment?query=${orgname}`
       )
       console.log('em', response.data)
       setResponse(response.data.result)
