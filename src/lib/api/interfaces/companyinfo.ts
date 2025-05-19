@@ -21,3 +21,26 @@ export interface InterestCompanyInfo {
   interestOrganization: interestOrganization
   companyInfo: CompanyInfo
 }
+
+export interface CompanyOverview {
+  id: string
+  status: string
+  message: string
+  corp_code: string
+  corp_name: string
+  corp_name_eng: string
+  stock_name: string
+  stock_code: string
+  ceo_nm: string
+  corp_cls: string
+  jurir_no: string
+  bizr_no: string
+  adres: string
+  hm_url: string
+  ir_url: string
+  phn_no: string
+  fax_no: string
+  induty_code: string
+  est_dt: string
+  acc_mt: string
+}

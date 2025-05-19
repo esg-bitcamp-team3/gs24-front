@@ -369,10 +369,10 @@ const CompanyInfoDetailCard = ({orgId}: {orgId: string}) => {
               기업 관련 키워드
             </Text>
             <Box w="600px" h="300px" overflow="hidden">
-              <ESGWordCloud
+              {/* <ESGWordCloud
                 query={companyinfo?.companyName || ''}
                 onNewsUpdate={handleNewsUpdate}
-              />
+              /> */}
             </Box>
           </VStack>
         </Box>

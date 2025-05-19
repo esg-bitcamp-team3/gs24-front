@@ -17,8 +17,8 @@ import React, {useEffect, useState} from 'react'
 import ESGWordCloud from '@/components/company/ESGWordCloud'
 import {EsgLineData} from '@/components/chartDataImport'
 import {EsgBarData} from '../barChart'
-import {CompanyInfo} from '@/lib/api/interfaces/companyinfo'
-import {getCompanyInfo, getInterestOrganization} from '@/lib/api/get'
+import {CompanyInfo, CompanyOverview} from '@/lib/api/interfaces/companyinfo'
+import {getCompanyInfo, getCorporationById, getInterestOrganization} from '@/lib/api/get'
 import {postInteresrtOrganization} from '@/lib/api/post'
 import {deleteInterestOrganization} from '@/lib/api/delete'
 import {OrganizationInfo} from '@/lib/api/interfaces/interestOrganization'
@@ -26,28 +26,22 @@ import {FcLikePlaceholder} from 'react-icons/fc'
 import {FcLike} from 'react-icons/fc'
 import {InfoIcon} from '@chakra-ui/icons'
 import {InfoItem} from '../InfoItem'
+import EmotionCard from './emotion'
+import KeywordNews from './KeywordNews'
+import {Tooltip} from '../ui/tooltip'
+import {LuInfo} from 'react-icons/lu'
 
 const KeywordTrendCard = ({orgId}: {orgId: string}) => {
-  const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
+  const [corporation, setCorporation] = useState<CompanyOverview>()
   const [showMore, setShowMore] = useState(false)
   const [ioCheck, setIoCheck] = useState<Boolean>(false)
-
+  const id = '00256292'
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const ciData = await getCompanyInfo(orgId)
-        if (ciData) setCompanyInfo(ciData || null)
-        else return null
-
-        const checkId = await getInterestOrganization()
-
-        if (
-          checkId?.organizationList.find((org: OrganizationInfo) => {
-            return org.organization.id === orgId
-          })
-        ) {
-          setIoCheck(true)
-        }
+        const response = await getCorporationById(id)
+        console.log('기업 정보:', response)
+        setCorporation(response)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -65,7 +59,7 @@ const KeywordTrendCard = ({orgId}: {orgId: string}) => {
     }
   }
   const [keywordNews, setKeywordNews] = useState<{title: string; link: string}[]>([])
-  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null)
+  const [selectedKeyword, setSelectedKeyword] = useState<string>('')
 
   const handleNewsUpdate = (
     newsList: {title: string; link: string}[],
@@ -73,6 +67,10 @@ const KeywordTrendCard = ({orgId}: {orgId: string}) => {
   ) => {
     console.log('🔥 부모가 받은 뉴스:', newsList, keyword)
     setKeywordNews(newsList)
+    setSelectedKeyword(keyword)
+  }
+
+  const handleKeywordClick = (keyword: string) => {
     setSelectedKeyword(keyword)
   }
 
@@ -99,26 +97,35 @@ const KeywordTrendCard = ({orgId}: {orgId: string}) => {
   return (
     <Flex direction={{base: 'column', md: 'column'}} gap={8} overflow={'auto'}>
       <Flex align="center" ml={4} gap={2}>
-        <Separator orientation="vertical" height="1.75em" borderWidth="2px" />
+        {/* <Separator orientation="vertical" height="1.75em" borderWidth="2px" /> */}
         <Text fontSize="3xl" fontWeight="bold">
-          {companyinfo?.companyName}
+          {corporation?.corp_name}
         </Text>
       </Flex>
       {/* 긍정 부정 ================================================================== */}
       <Box {...CARD_STYLES} p={6} w={{base: '100%', md: '30%'}}>
-        긍정 부정 컴포넌트 위치
+        {corporation?.corp_name && <EmotionCard orgname={corporation?.corp_name} />}
       </Box>
       <Flex direction={{base: 'column', md: 'row'}} gap={8}>
         {/* 관련 키워드 ================================================================== */}
-        <Box {...CARD_STYLES} p={6}  w={{base: '100%', md: '60%'}}>
-          <Text {...HEADING_STYLES} textAlign="center" mb={4}>
-            기업 관련 키워드
-          </Text>
+        <Box {...CARD_STYLES} p={6} w={{base: '100%', md: '60%'}}>
+          <Flex justify={'center'} align={'center'} mb={4} gap={4}>
+            <Text {...HEADING_STYLES} textAlign="center">
+              기업 관련 키워드
+            </Text>
+            <Tooltip
+              content="키워드를 클릭하면 관련 뉴스를 볼 수 있습니다"
+              positioning={{placement: 'bottom'}}
+              openDelay={10}
+              closeDelay={100}>
+              <LuInfo color="gray.400" />
+            </Tooltip>
+          </Flex>
           <Center>
             <Box w="600px" h="300px">
               <ESGWordCloud
-                query={companyinfo?.companyName || ''}
-                onNewsUpdate={handleNewsUpdate}
+                query={corporation?.corp_name || ''}
+                onWordClick={handleKeywordClick}
               />
             </Box>
           </Center>
@@ -126,8 +133,8 @@ const KeywordTrendCard = ({orgId}: {orgId: string}) => {
 
         {/* 키워드 관련 뉴스 ================================================================== */}
         {/* 뉴스 섹션 */}
-        <Box {...CARD_STYLES} p={6}  w={{base: '100%', md: '40%'}}>
-          <Text {...HEADING_STYLES} mb={4}>
+        <Box {...CARD_STYLES} p={6} w={{base: '100%', md: '40%'}}>
+          <Text {...HEADING_STYLES} textAlign="center" mb={4}>
             키워드 관련 뉴스
             {selectedKeyword && (
               <Text as="span" color="teal.500" ml={2}>
@@ -136,26 +143,7 @@ const KeywordTrendCard = ({orgId}: {orgId: string}) => {
             )}
           </Text>
           <Separator mb={4} />
-          <VStack align="stretch" gap={3}>
-            {keywordNews.map((news, idx) => (
-              <Link
-                key={idx}
-                href={news.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                p={2}
-                borderRadius="md"
-                _hover={{
-                  bg: 'gray.50',
-                  color: 'teal.500',
-                  textDecoration: 'none'
-                }}
-                display="flex"
-                alignItems="center">
-                <Text fontSize="sm">• {news.title}</Text>
-              </Link>
-            ))}
-          </VStack>
+          <KeywordNews query={corporation?.corp_name || ''} keyword={selectedKeyword} />
         </Box>
       </Flex>
     </Flex>
