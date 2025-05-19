@@ -36,6 +36,7 @@ export default function userInfoPage({id}: {id: string}) {
   const [check, setCheck] = useState<boolean>(false)
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
 
   // 사용자 정보 가져오기 (useEffect), 받은 정보를 상태로 저장
   useEffect(() => {
@@ -56,8 +57,14 @@ export default function userInfoPage({id}: {id: string}) {
     try {
       const tf = await checkingPassword({password: currentPassword})
       setCheck(Boolean(tf))
+      if (!tf) {
+        setPasswordError('비밀번호가 일치하지 않습니다.')
+      } else {
+        setPasswordError('')
+      }
     } catch (error) {
-      console.error('비밀번호 동일하지 않음', error)
+      console.error('비밀번호 확인 실패: ', error)
+      setPasswordError('비밀번호 확인에 실패했습니다.')
     }
   }
   // 저장 버튼 클릭 핸들러
@@ -215,7 +222,21 @@ export default function userInfoPage({id}: {id: string}) {
                     type="password"
                     value={currentPassword}
                     onChange={e => setCurrentPassword(e.target.value)}
+                    borderColor={
+                      passwordError ? 'red.300' : check ? 'green.300' : undefined
+                    }
                   />
+                  {passwordError ? (
+                    <Text color="red.500" fontSize="sm" mt="1">
+                      {passwordError}
+                    </Text>
+                  ) : (
+                    check && (
+                      <Text color="green.500" fontSize="sm" mt="1">
+                        비밀번호가 확인되었습니다.
+                      </Text>
+                    )
+                  )}
                   <Button
                     mt={2}
                     bg="gray.700"
@@ -226,23 +247,36 @@ export default function userInfoPage({id}: {id: string}) {
                     비밀번호 확인
                   </Button>
                 </Field.Root>
+
                 <Field.Root>
-                  <Field.Label>비밀번호 변경</Field.Label>
+                  <Field.Label>새 비밀번호</Field.Label>
                   <Input
                     type="password"
-                    value={password}
+                    value={check ? password : ''}
                     onChange={e => setPassword(e.target.value)}
+                    disabled={!check}
+                    placeholder={check ? '' : ' 비밀번호를 먼저 확인해주세요'}
+                    bg={check ? 'white' : 'gray.50'}
                   />
                 </Field.Root>
 
                 <Field.Root>
-                  <Field.Label>비밀번호 변경 확인</Field.Label>
+                  <Field.Label>새 비밀번호 확인</Field.Label>
                   <Input
                     type="password"
-                    value={confirmPassword}
+                    value={check ? confirmPassword : ''}
                     onChange={e => setConfirmPassword(e.target.value)}
+                    disabled={!check}
+                    placeholder={check ? '' : ' 비밀번호를 먼저 확인해주세요'}
+                    bg={check ? 'white' : 'gray.a50'}
                   />
                 </Field.Root>
+
+                {error && (
+                  <Text color="red.500" fontSize="sm">
+                    {error}
+                  </Text>
+                )}
                 <Button
                   mt={2}
                   bg="gray.700"
