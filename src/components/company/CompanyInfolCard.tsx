@@ -12,10 +12,11 @@ import {getCompanyInfo, getInterestOrganization} from '@/lib/api/get'
 import {postInteresrtOrganization} from '@/lib/api/post'
 import {deleteInterestOrganization} from '@/lib/api/delete'
 import {OrganizationInfo} from '@/lib/api/interfaces/interestOrganization'
-
+import {GiChart} from 'react-icons/gi'
 import {InfoItem} from '../InfoItem'
 import InterestButton from '../etcs/InterestButton'
-
+import {Menu, Portal} from '@chakra-ui/react'
+import RealTimeChart from './RealTimeChart'
 const CompanyInfoCard = ({orgId}: {orgId: string}) => {
   const [companyinfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
   const [showMore, setShowMore] = useState(false)
@@ -112,16 +113,47 @@ const CompanyInfoCard = ({orgId}: {orgId: string}) => {
         </Flex>
 
         <Flex justify="center" mt={6}>
-          <Button size={'md'}>더보기</Button>
+          <Menu.Root>
+            <Button size={'md'} onClick={() => setShowMore(!showMore)}>
+              {showMore ? '간단히 보기' : '더보기'}
+            </Button>
+            <Portal>
+              <Menu.Positioner>
+                <Menu.Content>
+                  <Menu.Item value="new-txt-a">
+                    New Text File <Menu.ItemCommand>⌘E</Menu.ItemCommand>
+                  </Menu.Item>
+                  <Menu.Item value="new-file-a">
+                    New File... <Menu.ItemCommand>⌘N</Menu.ItemCommand>
+                  </Menu.Item>
+                  <Menu.Item value="new-win-a">
+                    New Window <Menu.ItemCommand>⌘W</Menu.ItemCommand>
+                  </Menu.Item>
+                  <Menu.Item value="open-file-a">
+                    Open File... <Menu.ItemCommand>⌘O</Menu.ItemCommand>
+                  </Menu.Item>
+                  <Menu.Item value="export-a">
+                    Export <Menu.ItemCommand>⌘S</Menu.ItemCommand>
+                  </Menu.Item>
+                </Menu.Content>
+              </Menu.Positioner>
+            </Portal>
+          </Menu.Root>
         </Flex>
       </Box>
 
       <Flex direction={{base: 'column', md: 'row'}} gap={8}>
         {/* 주가 차트 */}
         <Box {...CARD_STYLES} p={6} w={{base: '100%', md: '50%'}}>
-          <Text {...HEADING_STYLES}>주가 차트</Text>
+          <Text {...HEADING_STYLES} display="flex" gap="3">
+            <GiChart /> 주식 가격
+          </Text>
           <Separator mt={2} mb={4} />
-          <Box>주가 차트</Box>
+          <VStack align="start" mt={2}>
+            <main className="p-10">
+              <RealTimeChart />
+            </main>
+          </VStack>
         </Box>
 
         {/* 기업 뉴스 */}

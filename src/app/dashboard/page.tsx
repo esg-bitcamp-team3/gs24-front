@@ -46,7 +46,6 @@ export default function Dashboard() {
       <Flex flexDirection="row" gap={4} width="full">
         <CorporateRank />
         <Flex flexDirection="column" gap={4} width="full">
-          <CarbonItemsChart />
           <Box
             p={3}
             borderRadius="lg"

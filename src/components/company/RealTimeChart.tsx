@@ -2,22 +2,32 @@
 
 import * as d3 from 'd3'
 import {useEffect, useRef, useState} from 'react'
-
+import {Box, Button, HStack, Spinner, Icon} from '@chakra-ui/react'
+import {BsUbuntu} from 'react-icons/bs'
+import {RiRefreshFill} from 'react-icons/ri'
 interface PricePoint {
   time: Date
   price: number
 }
 
 export default function RealTimeChart() {
+  const handleSync = async () => {
+    setIsSyncing(true) // 1. 버튼 누르면 즉시 스피너만 보이게
+    await new Promise(resolve => setTimeout(resolve, 1000)) // 2. 1초 기다림
+    await fetchPrice() // 3. 진짜 fetch 시작
+    setIsSyncing(false) // 4. 끝나면 복원
+  }
   const svgRef = useRef<SVGSVGElement | null>(null)
   const [data, setData] = useState<PricePoint[]>([])
   const companyCode = '138930'
-
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
   // ✅ 컴포넌트 내부에 선언해야 인식됨!
   const fetchPrice = async (): Promise<void> => {
+    setIsLoading(true)
     try {
       const res = await fetch(
-        `http://127.0.0.1:8000/api/stock/stock-history?code=${companyCode}&start_date=20250418&end_date=20250515&period_code=D&org_adj_prc=1`
+        `http://127.0.0.1/finance/finance/stock-history?code=${companyCode}&start_date=20250418&end_date=20250515&period_code=D&org_adj_prc=1`
       )
       const json = await res.json()
 
@@ -34,11 +44,13 @@ export default function RealTimeChart() {
         .sort(
           (a: {time: {getTime: () => number}}, b: {time: {getTime: () => number}}) =>
             a.time.getTime() - b.time.getTime()
-        ) // 날짜순 정렬
+        )
 
       setData(chartData)
     } catch (err) {
       console.error('📉 차트 데이터 로딩 실패:', err)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -52,15 +64,74 @@ export default function RealTimeChart() {
 
     svg.selectAll('*').remove()
 
+    // Define x scale
     const x = d3
       .scaleTime()
       .domain(d3.extent(data, d => d.time) as [Date, Date])
       .range([margin.left, width - margin.right])
 
+    const xAxis = d3
+      .axisBottom(x)
+      .ticks(10)
+      .tickFormat(domainValue =>
+        domainValue instanceof Date ? d3.timeFormat('%m-%d')(domainValue) : ''
+      )
+
+    svg
+      .append('g')
+      .attr('transform', `translate(0,${height - margin.bottom})`)
+      .call(xAxis)
+      .selectAll('text')
+      .attr('transform', 'rotate(-40)')
+      .style('text-anchor', 'end')
+      .style('font-size', '12px')
+      .style('fill', '#374151') // 텍스트 컬러
+
+    // X축 그리드 선은 따로!
+    svg
+      .append('g')
+      .attr('class', 'grid')
+      .attr('transform', `translate(0,${height - margin.bottom})`)
+      .call(
+        d3
+          .axisBottom(x)
+          .tickSize(-height + margin.top + margin.bottom)
+          .tickFormat(() => '')
+      )
+      .selectAll('line')
+      .attr('stroke', '#e5e7eb')
+      .attr('stroke-width', 0.5)
+
+    // Define y scale
     const y = d3
       .scaleLinear()
       .domain([d3.min(data, d => d.price)! * 0.98, d3.max(data, d => d.price)! * 1.02])
       .range([height - margin.bottom, margin.top])
+
+    const yAxis = d3.axisLeft(y).ticks(0) // 눈금 6개만!
+
+    svg
+      .append('g')
+      .attr('transform', `translate(${margin.left},0)`)
+      .call(yAxis)
+      .selectAll('text')
+      .style('font-size', '12px')
+      .style('fill', '#374151')
+
+    // Y축 그리드 선
+    svg
+      .append('g')
+      .attr('class', 'grid')
+      .attr('transform', `translate(${margin.left},0)`)
+      .call(
+        d3
+          .axisLeft(y)
+          .tickSize(-width + margin.left + margin.right)
+          .tickFormat(() => '')
+      )
+      .selectAll('line')
+      .attr('stroke', '#e5e7eb')
+      .attr('stroke-width', 0.5)
 
     const line = d3
       .line<PricePoint>()
@@ -83,6 +154,12 @@ export default function RealTimeChart() {
       .selectAll('text')
       .attr('transform', 'rotate(-40)')
       .style('text-anchor', 'end')
+      .attr('class', 'grid')
+      .attr('transform', `translate(0,${height - margin.bottom})`)
+
+      .selectAll('line')
+      .attr('stroke', '#e5e7eb')
+      .attr('stroke-width', 0.5)
 
     // Y축
     svg.append('g').attr('transform', `translate(${margin.left},0)`).call(d3.axisLeft(y))
@@ -122,7 +199,7 @@ export default function RealTimeChart() {
     const tooltipText = tooltip
       .append('text')
       .attr('x', 15)
-      .attr('y', -12)
+      .attr('y', 0)
       .attr('fill', '#111')
       .attr('font-size', '12px')
       .style('pointer-events', 'none')
@@ -155,13 +232,20 @@ export default function RealTimeChart() {
   }, [data])
 
   return (
-    <div className="p-4">
-      <button
-        onClick={fetchPrice}
-        className="mb-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
-        🔄 동기화
-      </button>
+    <Box p={4}>
+      <HStack gap={1} mb={2}>
+        <Button
+          onClick={handleSync}
+          disabled={isSyncing}
+          size="sm"
+          variant="outline"
+          colorScheme="blue">
+          <Icon as={RiRefreshFill} w={4} h={4} mr={2} />
+          동기화
+        </Button>
+      </HStack>
+
       <svg ref={svgRef} width={700} height={320}></svg>
-    </div>
+    </Box>
   )
 }
